@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="js/auth.js" defer></script>
+    <script src="js/ui.js" defer></script>
 </head>
 <body>
     <header>
@@ -15,19 +16,19 @@
                 <img src="images/craftech_logo.png" alt="Crafto Logo">
             </div>
             <div id="menu">
-                <div id="apps" class="menu-item" style="display:none;">
+                <div id="apps">
                     <img src="images/menu_toolbar.svg" alt="Apps Menu">
                 </div>
-                <div id="settings" class="menu-item" style="display:none;">
+                <div id="settings">
                     <img src="images/gear_toolbar.svg" alt="Settings">
                 </div>
-                <div id="help" class="menu-item">
+                <div id="help">
                     <img src="images/help_toolbar.svg" alt="Help">
                 </div>
             </div>
-            <div id="user-info" style="display:none;">
-                <span id="user-name"></span>
-                <img id="user-image" src="images/default-avatar.png" alt="User Avatar">
+            <div id="user-info">
+                <span id="user-name">John Doe</span>
+                <img id="user-image" src="images/default-avatar.png" alt="John Doe">
             </div>
         </div>
     </header>
@@ -35,5 +36,4 @@
         <!-- Aquí se cargarán las vistas según el usuario seleccione -->
     </div>
 </body>
-
 </html>
