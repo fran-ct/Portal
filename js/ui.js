@@ -1,26 +1,41 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Asignar eventos a los íconos del menú
-    document.getElementById('apps').addEventListener('click', loadAppsView);
-    document.getElementById('settings').addEventListener('click', loadSettingsView);
-    document.getElementById('help').addEventListener('click', loadHelpView);
+    document.getElementById('apps').addEventListener('click', function() {
+        loadAppsView();
+        history.pushState(null, '', '#apps');
+    });
+    document.getElementById('settings').addEventListener('click', function() {
+        loadSettingsView();
+        history.pushState(null, '', '#settings');
+    });
+    document.getElementById('help').addEventListener('click', function() {
+        loadHelpView();
+        history.pushState(null, '', '#help');
+    });
+
+    // Cargar la vista correcta al cargar la página
+    const currentHash = window.location.hash;
+    if (currentHash === '#apps' || currentHash === '') {
+        loadAppsView(); // Cargar la pantalla de aplicaciones por defecto
+    } else if (currentHash === '#settings') {
+        loadSettingsView();
+    } else if (currentHash === '#help') {
+        loadHelpView();
+    } else {
+        loadAppsView(); // Si no hay hash, también carga la pantalla de aplicaciones
+    }
 });
 
-function loadWelcomeView() {
+function loadWorklogManagerView() {
     const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Bienvenido a Worklog Manager</h2><p>Selecciona una opción del menú para comenzar.</p>';
-}
-
-function loadAppsView() {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Vista de Aplicaciones</h2><p>Aquí se gestionan las aplicaciones y herramientas integradas.</p>';
+    contentDiv.innerHTML = '<h2>Worklog Manager</h2><p>Aquí puedes gestionar tus worklogs.</p>';
 }
 
 function loadSettingsView() {
     const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Vista de Configuración</h2><p>Aquí puedes ajustar las configuraciones de la aplicación.</p>';
+    contentDiv.innerHTML = '<h2>Configuración</h2><p>Aquí puedes ajustar las configuraciones de Portal.</p>';
 }
 
 function loadHelpView() {
     const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Vista de Ayuda</h2><p>Aquí encontrarás ayuda y documentación sobre cómo usar la aplicación.</p>';
+    contentDiv.innerHTML = '<h2>Ayuda</h2><p>Aquí encontrarás ayuda y documentación sobre cómo usar Portal.</p>';
 }
