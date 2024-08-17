@@ -108,3 +108,114 @@ header {
         filter: invert(1); /* Invertir los colores para que el avatar sea blanco en modo oscuro */
     }
 }
+
+
+
+/* Estilo para el contenedor de la lista de aplicaciones */
+#app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilo para cada tarjeta (card) de la aplicación */
+.app-item {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-item h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4285f4;
+}
+
+.app-item p {
+    color: #555;
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+
+/* Estilo para el contenedor de la lista de aplicaciones */
+#app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilo para cada tarjeta (card) de la aplicación */
+.app-item {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-item h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4285f4;
+}
+
+.app-item p {
+    color: #555;
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    header {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    #content {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    #menu div img {
+        filter: invert(1);
+    }
+
+    .app-item {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .app-item h3 {
+        color: #8ab4f8;
+    }
+
+    .app-item p {
+        color: #b3b3b3;
+    }
+
+    .app-item:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9);
+    }
+}

@@ -12,23 +12,17 @@ document.addEventListener('DOMContentLoaded', function() {
         history.pushState(null, '', '#help');
     });
 
-    // Cargar la vista correcta al cargar la página
     const currentHash = window.location.hash;
     if (currentHash === '#apps' || currentHash === '') {
-        loadAppsView(); // Cargar la pantalla de aplicaciones por defecto
+        loadAppsView();
     } else if (currentHash === '#settings') {
         loadSettingsView();
     } else if (currentHash === '#help') {
         loadHelpView();
     } else {
-        loadAppsView(); // Si no hay hash, también carga la pantalla de aplicaciones
+        loadAppsView();
     }
 });
-
-function loadWorklogManagerView() {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Worklog Manager</h2><p>Aquí puedes gestionar tus worklogs.</p>';
-}
 
 function loadSettingsView() {
     const contentDiv = document.getElementById('content');

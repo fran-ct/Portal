@@ -9,14 +9,8 @@ const apps = [
     {
         id: 'settings',
         name: 'Configuración',
-        description: 'Ajusta las configuraciones de Portal',
+        description: 'Ajusta las configuraciones del Portal',
         loadView: loadSettingsView
-    },
-    {
-        id: 'help',
-        name: 'Ayuda',
-        description: 'Encuentra ayuda y documentación',
-        loadView: loadHelpView
     }
 ];
 
