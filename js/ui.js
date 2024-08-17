@@ -12,24 +12,18 @@ document.addEventListener('DOMContentLoaded', function() {
         history.pushState(null, '', '#help');
     });
 
+    // Cargar la vista correcta al cargar la página
     const currentHash = window.location.hash;
     if (currentHash === '#apps' || currentHash === '') {
-        loadAppsView();
+        loadAppsView(); // Cargar la pantalla de aplicaciones por defecto
     } else if (currentHash === '#settings') {
         loadSettingsView();
     } else if (currentHash === '#help') {
         loadHelpView();
+    } else if (currentHash === '#worklog-manager') {
+        loadWorklogManagerView();
     } else {
         loadAppsView();
     }
 });
 
-function loadSettingsView() {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Configuración</h2><p>Aquí puedes ajustar las configuraciones de Portal.</p>';
-}
-
-function loadHelpView() {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = '<h2>Ayuda</h2><p>Aquí encontrarás ayuda y documentación sobre cómo usar Portal.</p>';
-}

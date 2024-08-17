@@ -24,7 +24,10 @@ function loadAppsView() {
         const appDiv = document.createElement('div');
         appDiv.className = 'app-item';
         appDiv.innerHTML = `<h3>${app.name}</h3><p>${app.description}</p>`;
-        appDiv.addEventListener('click', app.loadView);
+        appDiv.addEventListener('click', function() {
+            app.loadView();
+            history.pushState(null, '', `#${app.id}`);  // Actualiza la URL al cargar la vista
+        });
         appListDiv.appendChild(appDiv);
     });
 }
