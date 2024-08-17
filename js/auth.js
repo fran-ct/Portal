@@ -3,7 +3,7 @@ var CLIENT_ID = "654333069607-8bb0ect8b87n5pdjkp1ptb463r15pb09.apps.googleuserco
 document.addEventListener('DOMContentLoaded', function() {
   gapi.load('auth2', function() {
       gapi.auth2.init({
-          client_id: CLIENT_ID // Reemplaza 'TU_CLIENT_ID' con el verdadero client ID
+          client_id: CLIENT_ID
       }).then(function(auth2) {
           if (auth2.isSignedIn.get()) {
               updateUIWithUser(auth2.currentUser.get().getBasicProfile());
