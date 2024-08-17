@@ -1,287 +1,128 @@
-/* Estilos específicos para Worklog Manager */
-#worklog-manager {
-    padding: 20px;
-    display: flex;
+/* General Styles */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
 }
 
-#worklog-table {
+/* Worklog Manager Specific Styles */
+#worklog-manager {
+    display: flex;
+    column-gap: 20px;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+
+}
+
+.column {
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter {
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #232222;
+    border-radius: 8px;
+}
+
+.issues, .events {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+#issuesTable, #eventsTable {
     width: 100%;
     border-collapse: collapse;
 }
 
-#worklog-table th, #worklog-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-#worklog-table th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-
-:root {
-    color-scheme: light dark;
-  }
-
-  body {
-    color: light-dark(#000000, #FAF0E6) !important;
-    background-color: light-dark(#ffffff, #222020) !important;
-  }
-
-  .column {
-    background-color: light-dark(#ffffff, #0e0e0e) !important
-  }
-
-  select {
-    color: light-dark(#000000, #FAF0E6) !important;
-    background-color: light-dark(#0000000a, #191919) !important;
-    border: light-dark(#000000, #FAF0E6) !important;
-
-  }
-
-  th {
-    color: light-dark(#000000, #FAF0E6) !important;
-    background-color: light-dark(#ffffff, #191919) !important;
-  }
-
-  #token-bar {
-    color: light-dark(#000000, #FAF0E6) !important;
-    background-color: light-dark(rgb(240, 128, 128), #DA0037) !important;
-  }
-
-  .z-depth-2 {
-    background-color: light-dark(#ffffff, #232222) !important;
-  }
-
-  #date-input {
-    border: light-dark(#000000, #FAF0E6) !important;
-    background-color: light-dark(#0000000a, #191919) !important;
-
-  }
-
-  #searchIssue {
-    background-color: light-dark(#0000000a, #191919) !important;
-
-  }
-
-  tr:hover {
-    background-color: rgba(0, 0, 0, -0.1);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .color-filter {
-      filter: brightness(4.5) !important;
-    }
-  }
-
-
-
-
-  h1 {
-    font-size: 36px;
-    text-align: center;
-  }
-
-
-  #container{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 20px;
+#issuesTable th, #eventsTable th, 
+#issuesTable td, #eventsTable td {
     padding: 10px;
-    margin: auto;
-    max-width: 1500px; 
-  }
+    border-bottom: 1px solid #333;
+}
 
-  .column{
-    padding: 20px;
-    background-color: white
-  }
+th {
+    background-color: #333;
+    color: #e0e0e0;
+}
 
-  table{
-    border: none;
-    
-  }
+td {
+    color: #b3b3b3;
+}
 
-  #column1{
-    height: 94.5vh;
-    overflow: hidden;
-  }
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
 
-  .issues{
-    height: calc(100% - 186px);
-    overflow: scroll;
-  }
+.center-text {
+    text-align: center;
+}
 
-
-  #searchIssue{
-    border: none !important;
-    outline: none !important;
-    padding-left: 10px !important;
-    width: calc(100% - 10px) !important;
-    height: 30px !important;
-    font-size: 14px !important;
-    margin: 0;
-  }
-
-  #date-input{
-    font-size: 16px;
-    padding: 4px;
-    border: 1px solid #f2f2f2;
-  }
-
-  #filter-issues{
+.filterRow, .calendar-filter-block {
+    margin-bottom: 10px;
     display: flex;
-    flex-flow: column;
-    gap: 5px; 
-    margin-bottom: 15px;
-    padding: 15px;
-  }
-
-
-  .filterRow{
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-  }
-
-
-  #filter-events{
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    margin-bottom: 15px;
-  }
+    flex-direction: column;
+}
 
-
-  .centerJiraColumn{
-    display: flex;
-    justify-content: center;
-  }
-
-  .button-container{
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
-  }
-
-  #updateEvents-btn{
+button {
     padding: 10px 20px;
     background-color: #007bff;
-    color: #fff;
+    color: white;
     border-radius: 5px;
     border: none;
     cursor: pointer;
-  }
+}
 
-  .toComment{
-    background-color: #0000000a !important;
-    padding-left: 15px !important; 
-    width: calc(100% - 15px) !important;
-    margin-bottom: 0px !important;
-  }
+.button-container{
+    margin-top: 20px;
+}
 
-  .bottom-container{
-    margin-top: 15px;
-    padding: 18px;
-  }
+button:hover {
+    background-color: #0056b3;
+}
 
-  #syncButton {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-  }
-  #syncButton:hover {
-    background-color: #0069d9;
-  }
-  #syncButton:disabled {
-    background-color: #e3e3e3;
+button:disabled {
+    background-color: #444;
     cursor: not-allowed;
-  }
+}
 
 
-
-
-  label{
-    font-size: 12px;
-    text-transform: uppercase;
-    align-self: center;
-    justify-self: flex-end;
-    margin-right: 4px;
-    margin-bottom: 0px;
-  }
-
-  select{
-    font-size: 14px;
-    height: 30px 
-  }
-
-  img{
-    width: auto; /*24px decia*/
-  }
-
-
-  #tool-bar{
-    display: flex;
-    flex-direction: row-reverse;
-  }
-
-  #instructions-btn a{
-    text-decoration: none;
-  }
+/* Adjustments for Dark Mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
     
-    table {
-			font-size: 13px;
-		}
-
-		th, td {
-			padding: 4px;
-      border-radius: 0 !important;
-		}
-
-		th {
-			background-color: #dad6d6;
-			font-weight: bold;
-			color: #282828;
-      font-size: 15px;
-		}
-    .noWrapping{
-      white-space: nowrap;
+    .column {
+        background-color: #1e1e1e;
+    }
+    
+    .filter, .issues, .events, .bottom-container {
+        background-color: #232222;
     }
 
+    .bottom-container {
+        margin-top: 20px !important;
+    }
+    
+    th {
+        background-color: #333;
+        color: #e0e0e0;
+    }
+    
+    td {
+        color: #b3b3b3;
+    }
+    
     tr:hover {
-			background-color: rgba(0, 0, 0,0.1);
-		}
-
-    tr.selected {
-			background-color: rgb(255 113 113 / 27%);
-		}
-  
-  tbody:first-child{
-    margin-left: 5px;
-  }
-
-  tr:first-child{
-    margin-left: 5px;
-  }
-
-  
-  .calendar-filter-block{
-    margin-right: 15px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .calendar-filter-block label{
-    width: 100%;
-  }
-
-  .center-text{
-    text-align: center;
-  }
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
