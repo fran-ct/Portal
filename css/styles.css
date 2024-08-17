@@ -1,0 +1,90 @@
+/* Reset básico */
+body, h1, h2, h3, p, ul, li, header {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Estilo del header */
+header {
+    background-color: #4285f4;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#logo img {
+    height: 40px;
+}
+
+#menu {
+    display: flex;
+    gap: 15px;
+}
+
+#menu div {
+    cursor: pointer;
+}
+
+#menu img {
+    width: 25px;
+    height: 25px;
+}
+
+/* Estilo del contenedor principal */
+#content {
+    margin-top: 20px;
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    header {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    #content {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    #menu div img {
+        filter: invert(1);
+    }
+}

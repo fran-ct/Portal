@@ -1,114 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-  <!-- Compiled and minified JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  <!--Import Google Icon Font-->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <!--Let browser know website is optimized for mobile-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" src="index.css">
-  <link rel="stylesheet" src="header.css">
-  <link rel="stylesheet" src="worklogManager.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worklog Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="js/auth.js" defer></script>
 </head>
 <body>
-  <div id="header">
-    <div id="progressBar" class="progress">
-      <div class="indeterminate"></div>
+    <header>
+        <div id="header-content">
+            <div id="logo">
+                <img src="images/craftech_logo.png" alt="Crafto Logo">
+            </div>
+            <div id="menu">
+                <div id="apps" class="menu-item" style="display:none;">
+                    <img src="images/menu_toolbar.svg" alt="Apps Menu">
+                </div>
+                <div id="settings" class="menu-item" style="display:none;">
+                    <img src="images/gear_toolbar.svg" alt="Settings">
+                </div>
+                <div id="help" class="menu-item">
+                    <img src="images/help_toolbar.svg" alt="Help">
+                </div>
+            </div>
+            <div id="user-info" style="display:none;">
+                <span id="user-name"></span>
+                <img id="user-image" src="images/default-avatar.png" alt="User Avatar">
+            </div>
+        </div>
+    </header>
+    <div id="content">
+        <!-- Aquí se cargarán las vistas según el usuario seleccione -->
     </div>
-    <div id="token-bar">
-      <input type="text" id="token" placeholder="Insert your Jira token to start">
-      <button type="submit" id="token-btn">Save</button>
-      <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">- Get you Jira token
-        here</a>
-      <a href="https://app.tango.us/app/workflow/Worklog-Manager---How-to-start---use-791f96dab0e74adc872182b25a7ac55a"
-        target="_blank">- Instructions</a>
-    </div>
-    <div id="tool-bar">
-      <button type="submit" id="tokenUpdate-btn">Update token</button>
-      <button type="submit" id="dataUpdate-btn">Update data</button>
-      <button type="submit" id="dataClearer-btn">Clear data</button>
-      <!--<button type="submit" id="calendar-header-btn">Calendar</button>
-<button type="submit" id="chronometer-header-btn">Chronometer</button>-->
-    </div>
-  </div>
-  <div id="bodyBox">
-    <div id="container">
-      <div class="column z-depth-3" id="column1">
-        <div id="filter-issues" class="filter z-depth-2">
-          <div class="filterRow">
-            <label for="squadId">Squad:</label>
-            <select id="squadId" class="browser-default"></select>
-          </div>
-          <div class="filterRow">
-            <label for="project">Project:</label>
-            <select id="project" class="browser-default"></select>
-          </div>
-          <div class="filterRow">
-            <label for="assignee">Assignee:</label>
-            <select id="assignee" class="browser-default"></select>
-          </div>
-          <div class="filterRow">
-            <label for="searchIssue">Summary search:</label>
-            <input type="text" id="searchIssue" placeholder="Start writing to filter" />
-          </div>
-        </div>
-        <div class="issues z-depth-2">
-          <table id="issuesTable">
-            <thead>
-              <tr>
-                <th>Summary</th>
-                <th class="center-text">Spent</th>
-                <th>Link</th>
-                <th class="center-text">Status</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="column z-depth-3" id="column2">
-        <div id="filter-events" class="filter z-depth-2">
-          <div class="calendar-filter-block">
-            <label for="calendar-select">Calendar:</label>
-            <select id="calendar-select" class="browser-default"></select>
-          </div>
-          <div class="calendar-filter-block">
-            <label for="date-input">Date:</label>
-            <input type="date" id="date-input" class="browser-default" />
-          </div>
-          <div>
-            <button id="updateEvents-btn">Update</button>
-          </div>
-        </div>
-        <div class="events z-depth-2">
-          <table id="eventsTable">
-            <thead>
-              <tr>
-                <th>Start Time</th>
-                <th>Title</th>
-                <th>Duration</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="bottom-container z-depth-2">
-          <input type="text" class="toComment" id="selectedEventComment" placeholder="Comment" />
-        </div>
-        <div class="button-container">
-          <button id="syncButton">Sync</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script src="index.js" language="javascript" type="text/javascript"></script>
-  <script src="header.js" language="javascript" type="text/javascript"></script>
-  <script src="worklogManager.js" language="javascript" type="text/javascript"></script>
 </body>
 </html>
