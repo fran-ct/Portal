@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <?!= HtmlService.createHtmlOutputFromFile("index_style").getContent(); ?>  
+</head>
+<body>
+
+  <div id="header">
+    <?!= HtmlService.createHtmlOutputFromFile("header_style").getContent(); ?>  
+    <?!= HtmlService.createHtmlOutputFromFile("header").getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile("header_script").getContent(); ?>
+  </div>
+
+  <div id="bodyBox">
+    <?!= HtmlService.createHtmlOutputFromFile(page+"_style").getContent(); ?>  
+    <?!= HtmlService.createHtmlOutputFromFile(page).getContent(); ?>
+    <?!= HtmlService.createHtmlOutputFromFile(page+"_script").getContent(); ?>
+  </div>
+
+  <?!= HtmlService.createHtmlOutputFromFile("index_script").getContent(); ?>
+
+</body>
+</html>
+
+
+
