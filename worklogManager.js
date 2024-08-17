@@ -1,4 +1,4 @@
-<script>
+
 
   var events = null
   var issues = null
@@ -410,5 +410,3 @@ $(document).ready(function() {
 
 });
 
-
-</script>
