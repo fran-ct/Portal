@@ -1,12 +1,9 @@
-
-
 /* Worklog Manager Specific Styles */
 #worklog-manager {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
     flex-direction: row;
-    align-items: flex-start;
 
 }
 
@@ -16,12 +13,14 @@ label {
 }
 
 
-select,input {
+
+select,
+input {
     padding: 0.3rem;
 
 }
 
-.buttonRow{
+.buttonRow {
     display: flex;
     justify-content: flex-end;
 
@@ -38,48 +37,63 @@ select,input {
     box-shadow: none;
     background-color: transparent !important;
 }
-.column {
+
+.container {
     background-color: #232222;
     padding: 15px;
     border-radius: 8px;
-    flex: 1;
     display: flex;
     flex-direction: column;
     box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
 }
+
+#container1{
+    flex: 1;
+}
+
 
 .subContainer {
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
+}
+
+
+.container-group{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
 
 }
 
-.issues, .events {
+.issues,
+.events {
     flex: 1;
     overflow-y: auto;
     border-radius: 8px;
 }
 
-#issuesTable, #eventsTable {
+#issuesTable,
+#eventsTable {
     width: 100%;
     border-collapse: collapse;
 }
 
 #eventsTable {
-    margin-bottom: 15px;
     border-radius: 8px;
-    box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
 }
 
-#issuesTable th, #eventsTable th, 
-#issuesTable td, #eventsTable td {
+#issuesTable th,
+#eventsTable th,
+#issuesTable td,
+#eventsTable td {
     padding: 0.3rem;
     border-bottom: 1px solid #333;
 }
 
-#updateEvents-btn{
+#updateEvents-btn {
     margin-top: 12px;
 }
 
@@ -106,7 +120,8 @@ tr {
     text-align: center;
 }
 
-.filterRow, .calendar-filter-block {
+.filterRow,
+.calendar-filter-block {
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
@@ -122,7 +137,7 @@ button {
     cursor: pointer;
 }
 
-.button-container{
+.button-container {
     margin-top: 22px;
 }
 
@@ -135,32 +150,53 @@ button:disabled {
     cursor: not-allowed;
 }
 
-#selectedEventComment{
+#selectedEventComment {
     width: calc(100% - 14px);
 }
 
 
 /* Adjustments for Dark Mode */
 @media (prefers-color-scheme: dark) {
-    
-    .column {
+
+    .container {
         background-color: #232222;
     }
-    
-    .filter, .issues, .events {
+
+    .filter,
+    .issues,
+    .events {
         background-color: #232222;
     }
-    
+
     th {
         background-color: #333;
         color: #e0e0e0;
     }
-    
+
     td {
         color: #b3b3b3;
     }
-    
+
     tr:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
+}
+
+
+@media (max-width: 768px) {
+    td {
+        font-size: 0.9rem;
+    }
+
+    #worklog-manager {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        flex-direction: column;
+    
+    }
+    .container-group{
+        gap: 10px;
+    }
+    
 }

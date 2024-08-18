@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="views/worklogManager/worklogManager.css">
 
 <div class="app worklog-manager" id="worklog-manager">
-    <div class="column z-depth-3" id="column1">
+    <div class="container z-depth-3" id="container1">
         <div id="filter-issues" class="subContainer z-depth-2">
             <div class="filterRow">
                 <label for="squadId">Squad:</label>
@@ -50,56 +50,59 @@
                         <td class="center-text">To Do</td>
                     </tr>
                 </tbody>
-                
+
             </table>
         </div>
     </div>
-    <div class="column z-depth-3" id="column2">
-        <div id="filter-events" class="subContainer z-depth-2">
-            <div class="calendar-filter-block">
-                <label for="calendar-select">Calendar:</label>
-                <select id="calendar-select" class="browser-default"></select>
+    <div class="container-group">
+        <div class="container z-depth-3" id="container2">
+            <div id="filter-events" class="subContainer z-depth-2">
+                <div class="calendar-filter-block">
+                    <label for="calendar-select">Calendar:</label>
+                    <select id="calendar-select" class="browser-default"></select>
+                </div>
+
+                <div class="calendar-filter-block">
+                    <label for="date-input">Date:</label>
+                    <input type="date" id="date-input" />
+                </div>
+
+                <div class="buttonRow">
+                    <button id="updateEvents-btn">Update</button>
+                </div>
+            </div>
+            <div class="events z-depth-2">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Title</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:00 AM</td>
+                            <td>Daily Standup</td>
+                            <td>30m</td>
+                        </tr>
+                        <tr>
+                            <td>11:00 AM</td>
+                            <td>Client Meeting</td>
+                            <td>1h</td>
+                        </tr>
+                        <tr>
+                            <td>02:00 PM</td>
+                            <td>Code Review</td>
+                            <td>1h 15m</td>
+                        </tr>
+                    </tbody>
+
+                </table>
             </div>
 
-            <div class="calendar-filter-block">
-                <label for="date-input">Date:</label>
-                <input type="date" id="date-input"/>
-            </div>
-
-            <div class="buttonRow">
-                <button id="updateEvents-btn">Update</button>
-            </div>
         </div>
-        <div class="events z-depth-2">
-            <table id="eventsTable">
-                <thead>
-                    <tr>
-                        <th>Start Time</th>
-                        <th>Title</th>
-                        <th>Duration</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>09:00 AM</td>
-                        <td>Daily Standup</td>
-                        <td>30m</td>
-                    </tr>
-                    <tr>
-                        <td>11:00 AM</td>
-                        <td>Client Meeting</td>
-                        <td>1h</td>
-                    </tr>
-                    <tr>
-                        <td>02:00 PM</td>
-                        <td>Code Review</td>
-                        <td>1h 15m</td>
-                    </tr>
-                </tbody>
-                
-            </table>
-        </div>
-        <div class="subContainer z-depth-2">
+        <div class="container z-depth-3" id="container3">
             <div>
                 <input type="text" class="toComment" id="selectedEventComment" placeholder="Comment" />
             </div>
@@ -107,7 +110,5 @@
                 <button id="syncButton">Sync</button>
             </div>
         </div>
-
     </div>
-
 </div>
