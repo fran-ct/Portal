@@ -7,6 +7,9 @@
 
 }
 
+td {
+    font-size: 0.9rem;
+}
 
 label {
     font-size: 0.8rem;
@@ -199,4 +202,15 @@ button:disabled {
         gap: 10px;
     }
     
+}
+
+
+@media (max-width: 450px) {
+    td {
+        font-size: 0.8rem;
+    }
+    th {
+        font-size: 0.9rem;
+    }
+
 }
