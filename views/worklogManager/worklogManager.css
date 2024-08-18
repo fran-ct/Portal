@@ -87,7 +87,7 @@ select,input {
 th {
     background-color: #333;
     color: #e0e0e0;
-
+    text-align: left;
 }
 
 td {
