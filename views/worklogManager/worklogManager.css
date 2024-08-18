@@ -21,6 +21,7 @@ select, input {
     padding: 0.3rem;
     background-color: #444;
     border: none;
+    color: #e0e0e0;
 }
 
 .buttonRow {
@@ -193,13 +194,15 @@ button:disabled {
 
     #worklog-manager {
         display: flex;
-        gap: 10px;
+        column-gap: 10px;
+        row-gap: 15px;
         flex-wrap: wrap;
         flex-direction: column;
     
     }
     .container-group{
-        gap: 10px;
+        column-gap: 10px;
+        row-gap: 15px;
     }
     
 }
