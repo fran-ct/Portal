@@ -1,8 +1,4 @@
-/* General Styles */
-body {
-    background-color: #121212;
-    color: #e0e0e0;
-}
+
 
 /* Worklog Manager Specific Styles */
 #worklog-manager {
@@ -14,20 +10,50 @@ body {
 
 }
 
+
+label {
+    font-size: 0.8rem;
+}
+
+
+select,input {
+    padding: 0.3rem;
+
+}
+
+.buttonRow{
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+
+#content {
+    margin-top: 20px;
+    padding: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: none;
+    background-color: transparent !important;
+}
 .column {
-    background-color: #121212;
+    background-color: #232222;
     padding: 15px;
     border-radius: 8px;
     flex: 1;
     display: flex;
     flex-direction: column;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
 }
 
-.filter {
+.subContainer {
     padding: 10px;
     margin-bottom: 15px;
-    background-color: #232222;
     border-radius: 8px;
+    box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
+
 }
 
 .issues, .events {
@@ -41,15 +67,27 @@ body {
     border-collapse: collapse;
 }
 
+#eventsTable {
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
+}
+
 #issuesTable th, #eventsTable th, 
 #issuesTable td, #eventsTable td {
-    padding: 10px;
+    padding: 0.3rem;
     border-bottom: 1px solid #333;
 }
+
+#updateEvents-btn{
+    margin-top: 12px;
+}
+
 
 th {
     background-color: #333;
     color: #e0e0e0;
+
 }
 
 td {
@@ -58,6 +96,10 @@ td {
 
 tr:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+tr {
+    height: 25px;
 }
 
 .center-text {
@@ -72,7 +114,7 @@ tr:hover {
 }
 
 button {
-    padding: 10px 20px;
+    padding: 0.3rem 20px;
     background-color: #007bff;
     color: white;
     border-radius: 5px;
@@ -81,7 +123,7 @@ button {
 }
 
 .button-container{
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
 button:hover {
@@ -94,27 +136,19 @@ button:disabled {
 }
 
 #selectedEventComment{
-    width: calc(100% - 10px);
+    width: calc(100% - 14px);
 }
 
 
 /* Adjustments for Dark Mode */
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #121212;
-        color: #e0e0e0;
-    }
     
     .column {
-        background-color: #121212;
-    }
-    
-    .filter, .issues, .events, .bottom-container {
         background-color: #232222;
     }
-
-    .bottom-container {
-        margin-top: 20px !important;
+    
+    .filter, .issues, .events {
+        background-color: #232222;
     }
     
     th {
