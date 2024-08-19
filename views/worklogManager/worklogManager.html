@@ -1,0 +1,114 @@
+<link rel="stylesheet" href="views/worklogManager/worklogManager.css">
+
+<div class="app worklog-manager" id="worklog-manager">
+    <div class="container z-depth-3" id="container1">
+        <div id="filter-issues" class="subContainer z-depth-2">
+            <div class="filterRow">
+                <label for="squadId">Squad:</label>
+                <select id="squadId" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="project">Project:</label>
+                <select id="project" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="assignee">Assignee:</label>
+                <select id="assignee" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="searchIssue">Summary search:</label>
+                <input type="text" id="searchIssue" placeholder="Start writing to filter" />
+            </div>
+        </div>
+        <div class="issues z-depth-2">
+            <table id="issuesTable">
+                <thead>
+                    <tr>
+                        <th>Summary</th>
+                        <th class="center-text">Spent</th>
+                        <th>Link</th>
+                        <th class="center-text">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Implement login feature</td>
+                        <td class="center-text">3h </td>
+                        <td><a href="https://example.com/issue/1234" target="_blank">#1234</a></td>
+                        <td class="center-text">In Progress</td>
+                    </tr>
+                    <tr>
+                        <td>Fix bug in payment processing</td>
+                        <td class="center-text">2h</td>
+                        <td><a href="https://example.com/issue/5678" target="_blank">#5678</a></td>
+                        <td class="center-text">Done</td>
+                    </tr>
+                    <tr>
+                        <td>Update user dashboard</td>
+                        <td class="center-text">30m</td>
+                        <td><a href="https://example.com/issue/9101" target="_blank">#9101</a></td>
+                        <td class="center-text">To Do</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="container-group">
+        <div class="container z-depth-3" id="container2">
+            <div id="filter-events" class="subContainer z-depth-2">
+                <div class="calendar-filter-block">
+                    <label for="calendar-select">Calendar:</label>
+                    <select id="calendar-select" class="browser-default"></select>
+                </div>
+
+                <div class="calendar-filter-block">
+                    <label for="date-input">Date:</label>
+                    <input type="date" id="date-input" />
+                </div>
+
+                <div class="buttonRow">
+                    <button id="updateEvents-btn">Update</button>
+                </div>
+            </div>
+            <div class="events z-depth-2">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Title</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:00 AM</td>
+                            <td>Daily Standup</td>
+                            <td>30m</td>
+                        </tr>
+                        <tr>
+                            <td>11:00 AM</td>
+                            <td>Client Meeting</td>
+                            <td>1h</td>
+                        </tr>
+                        <tr>
+                            <td>02:00 PM</td>
+                            <td>Code Review</td>
+                            <td>1h 15m</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+        <div class="container z-depth-3" id="container3">
+            <div>
+                <input type="text" class="toComment" id="selectedEventComment" placeholder="Comment" />
+            </div>
+            <div class="buttonRow button-container">
+                <button id="syncButton">Sync</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,219 @@
+/* Worklog Manager Specific Styles */
+#worklog-manager {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+}
+
+td {
+    font-size: 0.9rem;
+}
+
+label {
+    font-size: 0.8rem;
+}
+
+
+
+select, input {
+    padding: 0.3rem;
+    background-color: #444;
+    border: none;
+    color: #e0e0e0;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+
+#content {
+    margin-top: 20px;
+    padding: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: none;
+    background-color: transparent !important;
+}
+
+.container {
+    background-color: #232222;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+}
+
+#container1{
+    flex: 1;
+}
+
+
+.subContainer {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
+}
+
+
+.container-group{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+
+}
+
+.issues,
+.events {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+#issuesTable,
+#eventsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#eventsTable {
+    border-radius: 8px;
+}
+
+#issuesTable th,
+#eventsTable th,
+#issuesTable td,
+#eventsTable td {
+    padding: 0.3rem;
+    border-bottom: 1px solid #333;
+}
+
+#updateEvents-btn {
+    margin-top: 12px;
+}
+
+
+th {
+    background-color: #333;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+td {
+    color: #b3b3b3;
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+tr {
+    height: 25px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.filterRow,
+.calendar-filter-block {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+button {
+    padding: 0.3rem 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.button-container {
+    margin-top: 22px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+}
+
+#selectedEventComment {
+    width: calc(100% - 14px);
+}
+
+
+/* Adjustments for Dark Mode */
+@media (prefers-color-scheme: dark) {
+
+    .container {
+        background-color: #232222;
+    }
+
+    .filter,
+    .issues,
+    .events {
+        background-color: #232222;
+    }
+
+    th {
+        background-color: #333;
+        color: #e0e0e0;
+    }
+
+    td {
+        color: #b3b3b3;
+    }
+
+    tr:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+
+@media (max-width: 768px) {
+    td {
+        font-size: 0.9rem;
+    }
+
+    #worklog-manager {
+        display: flex;
+        column-gap: 10px;
+        row-gap: 15px;
+        flex-wrap: wrap;
+        flex-direction: column;
+    
+    }
+    .container-group{
+        column-gap: 10px;
+        row-gap: 15px;
+    }
+    
+}
+
+
+@media (max-width: 450px) {
+    td {
+        font-size: 0.8rem;
+    }
+    th {
+        font-size: 0.9rem;
+    }
+
+}

@@ -1,0 +1,265 @@
+/* Reset básico */
+body, h1, h2, h3, p, ul, li, header {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#content h2{
+    font-size: 1.5rem ;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif !important;
+    background-color: #f4f4f4 !important;
+    color: #333 !important;
+    line-height: 1.6 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 20px !important;
+
+}
+
+/* Estilo del header */
+header {
+    background-color: #4285f4 !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 1200px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+#header-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+#logo img {
+    height: 40px !important;
+}
+
+#menu {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    margin-left: auto !important;
+}
+
+#menu div {
+    cursor: pointer !important;
+}
+
+#menu img {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+#user-info {
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+    gap: 10px !important;
+    margin-left: 20px !important;
+}
+
+#user-info img {
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+/* Estilo del contenedor principal */
+#content {
+    margin-top: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+    
+    header {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+
+    #content {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+
+    #menu div img {
+        filter: invert(1) !important;
+    }
+
+    #user-info img {
+        filter: invert(1) !important; /* Invertir los colores para que el avatar sea blanco en modo oscuro */
+    }
+}
+
+
+
+/* Estilo para el contenedor de la lista de aplicaciones */
+#app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilo para cada tarjeta (card) de la aplicación */
+.app-item {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-item h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4285f4;
+}
+
+.app-item p {
+    color: #555;
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+
+/* Estilo para el contenedor de la lista de aplicaciones */
+#app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilo para cada tarjeta (card) de la aplicación */
+.app-item {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-item h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4285f4;
+}
+
+.app-item p {
+    color: #555;
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+    
+    header {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+
+    #content {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+
+    #menu div img {
+        filter: invert(1) !important;
+    }
+
+    .app-item {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .app-item h3 {
+        color: #8ab4f8;
+    }
+
+    .app-item p {
+        color: #b3b3b3;
+    }
+
+    .app-item:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9);
+    }
+}
+
+
+/* Estilos generales */
+#user-name {
+    display: block !important; /* Visible por defecto */
+}
+
+#menu div {
+    height: auto !important; /* Valor por defecto */
+}
+
+/* Estilos para pantallas pequeñas (modo vertical o móviles) */
+@media (max-width: 768px) {
+    #user-name {
+        display: none !important; /* Oculta el nombre del usuario */
+    }
+
+    header {
+        padding: 3px 10px !important; /* Cambia el padding del header */
+    }
+
+
+    #menu div {
+        height: 23px !important; /* Ajusta la altura del ícono en el menú */
+    }
+    #menu {
+        gap: 7px !important;
+    }
+    #user-info {
+        gap: 5px !important;
+        margin-left: 7px !important;
+    }
+    body{
+        padding: 10px !important;
+    }
+    
+}
+
+
