@@ -13,6 +13,7 @@ td {
 
 label {
     font-size: 0.8rem;
+    flex: 0.3;
 }
 
 
@@ -22,6 +23,8 @@ select, input {
     background-color: #444;
     border: none;
     color: #e0e0e0;
+    flex: 1;
+
 }
 
 .buttonRow {
@@ -43,7 +46,7 @@ select, input {
 }
 
 .container {
-    background-color: #232222;
+    background-color: #1e1e1e;
     padding: 15px;
     border-radius: 8px;
     display: flex;
@@ -128,8 +131,10 @@ tr {
 .calendar-filter-block {
     margin-bottom: 10px;
     display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    flex-direction: column;
+    flex-wrap: wrap;
 }
 
 button {
@@ -163,13 +168,13 @@ button:disabled {
 @media (prefers-color-scheme: dark) {
 
     .container {
-        background-color: #232222;
+        background-color: #1e1e1e;
     }
 
     .filter,
     .issues,
     .events {
-        background-color: #232222;
+        background-color: #1e1e1e;
     }
 
     th {
