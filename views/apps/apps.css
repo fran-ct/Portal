@@ -1,0 +1,37 @@
+#apps-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.app-item {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex: 1 1 calc(33.333% - 20px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.app-item h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.app-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+#content {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+    #apps-list {
+        flex-direction: column;
+    }
+}

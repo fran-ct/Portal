@@ -6,14 +6,13 @@
     <title>Portal</title>
     <link rel="icon" type="image/png" href="images/Crafto.png">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script src="js/auth.js" defer></script>
-    <script src="js/views.js" defer></script>
-    <script src="js/apps.js" defer></script>
+    <script src="js/appList.js" defer></script>
     <script src="js/ui.js" defer></script>
+    <script src="js/views.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
 <body>
     <header>
@@ -23,13 +22,13 @@
             </div>
             <div id="menu">
                 <div id="apps">
-                    <img src="images/menu_toolbar.svg" alt="Apps Menu">
+                    <img src="images/menu_toolbar.svg" alt="Apps Menu" onclick="loadView('apps', 'Apps'); history.pushState(null, '', '#apps');">
                 </div>
                 <div id="settings">
-                    <img src="images/gear_toolbar.svg" alt="Settings">
+                    <img src="images/gear_toolbar.svg" alt="Settings" onclick="loadView('settings', 'Settings'); history.pushState(null, '', '#settings');">
                 </div>
                 <div id="help">
-                    <img src="images/help_toolbar.svg" alt="Help">
+                    <img src="images/help_toolbar.svg" alt="Help" onclick="loadView('help', 'Help'); history.pushState(null, '', '#help');">
                 </div>
             </div>
             <div id="user-info">
@@ -38,8 +37,9 @@
             </div>
         </div>
     </header>
+    
     <div id="content">
-        <!-- Aquí se cargarán las vistas según el usuario seleccione -->
+        <!-- Aquí se cargarán dinámicamente las vistas -->
     </div>
 </body>
 </html>

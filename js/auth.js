@@ -1,5 +1,5 @@
 var CLIENT_ID = "654333069607-8bb0ect8b87n5pdjkp1ptb463r15pb09.apps.googleusercontent.com"
-
+/** 
 document.addEventListener('DOMContentLoaded', function() {
   gapi.load('auth2', function() {
       gapi.auth2.init({
@@ -33,3 +33,4 @@ function showHelpOnly() {
   document.getElementById('help').style.display = 'block';
   document.getElementById('user-info').style.display = 'none';
 }
+*/ 

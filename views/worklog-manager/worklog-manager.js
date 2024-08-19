@@ -1,3 +1,10 @@
+function initializeView() {
+
+
+}
+
+
+
 
 var events = null
 var issues = null
