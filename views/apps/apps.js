@@ -13,7 +13,7 @@ function loadApps() {
   appsList.innerHTML = ''; // Limpia la lista de apps
 
   window.apps.forEach(app => {
-    if(app.group!='home'){
+    if(app.group!='blocked'){
 
       const appItem = document.createElement('div');
       appItem.className = 'app-item';
