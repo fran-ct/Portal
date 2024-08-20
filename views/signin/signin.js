@@ -29,12 +29,10 @@ function handleCredentialResponse(response) {
 
     // Mostrar el contenido de la página si está autenticado
     // Obtener todos los elementos con la clase 'headerItem'
-    var elements = document.getElementsByClassName('headerItem');
-    console.log(elements)
-    // Convertir la colección en un array y usar forEach
-    elements.forEach( (element) =>{
-        element.style.display = 'block';
-    });
+
+    const elements = document.getElementsByClassName("headerItem");
+    Array.prototype.forEach.call(elements,(elem) => elem.style = 'display="none"',
+    );
 
     // Cargar la vista principal
     loadView('apps', 'Apps');
