@@ -1,5 +1,4 @@
 function initializeView() {
-  console.log('Apps view loaded');
   loadApps();  // Cargar las aplicaciones disponibles
 }
 
