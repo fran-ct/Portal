@@ -15,6 +15,7 @@ function handleCredentialResponse(response) {
   // Cargar la vista principal
   loadView('apps', 'Apps');
 
+  console.log(profile)
   // Actualizar la interfaz con la información del usuario
   document.getElementById('user-name').textContent = profile.name;
   document.getElementById('user-image').src = profile.picture;
