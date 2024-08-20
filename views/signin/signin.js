@@ -27,7 +27,13 @@ function handleCredentialResponse(response) {
     sessionStorage.setItem('id_token', credential);
 
     // Mostrar el contenido de la página si está autenticado
-    document.getElementsByClassName('headerItem').style.display = 'block';
+    // Obtener todos los elementos con la clase 'headerItem'
+    var elements = document.getElementsByClassName('headerItem');
+
+    // Convertir la colección en un array y usar forEach
+    Array.prototype.forEach.call(elements, function(element) {
+        element.style.display = 'block';
+    });
 
     // Cargar la vista principal
     loadView('apps', 'Apps');
