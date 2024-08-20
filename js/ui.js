@@ -3,12 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentHash) {
         loadView(currentHash, getAppNameById(currentHash));
     } else {
-        loadView('apps', 'Apps');
-    }
-
-    const id_token = sessionStorage.getItem('id_token');
-    if (!id_token) {
-        document.getElementById('content').style.display = 'none';
+        var homeView = window.apps.filter(element => {
+            return element.group == "home"
+        })[0];
+        loadView(homeView.id ,homeView.name);
     }
 });
 

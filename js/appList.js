@@ -21,12 +21,18 @@ window.apps = [
         id: 'apps',
         name: 'Apps',
         comment: 'Select an Application',
-        group: 'home'
+        group: 'public'
     },
     {
         id: 'signin',
         name: 'Sign in',
-        comment: 'Google SSO',
-        group: 'public'
+        comment: 'Google one tap login view',
+        group: 'home'
+    },
+    {
+        id: 'loading',
+        name: 'Loading...',
+        comment: 'View shown when a view change (only for system)',
+        group: 'system'
     }
 ];

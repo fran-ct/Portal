@@ -6,9 +6,9 @@
     <title>Portal</title>
     <link rel="icon" type="image/png" href="images/Crafto.png">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="js/init.js" defer></script>
-    <script src="js/auth.js" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -16,31 +16,30 @@
             <div id="logo">
                 <img src="images/craftech_logo.png" alt="Crafto Logo">
             </div>
-            <div id="auth-controls">
-                <div id="g_id_onload"
-                    data-client_id="654333069607-8bb0ect8b87n5pdjkp1ptb463r15pb09.apps.googleusercontent.com"
-                    data-callback="handleCredentialResponse">
+            <div id="menu">
+                <div id="apps" class="headerItem">
+                    <img src="images/menu_toolbar.svg" alt="Apps Menu" onclick="loadView('apps', 'Apps'); history.pushState(null, '', '#apps');">
                 </div>
-                <div class="g_id_signin"
-                    data-type="standard"
-                    data-size="large"
-                    data-theme="outline"
-                    data-text="sign_in_with"
-                    data-shape="rectangular"
-                    data-logo_alignment="left">
+                <div id="settings" class="headerItem" style="display: none;">
+                    <img src="images/gear_toolbar.svg" alt="Settings" onclick="loadView('settings', 'Settings'); history.pushState(null, '', '#settings');">
                 </div>
+                <div id="help" class="headerItem" style="display: none;">
+                    <img src="images/help_toolbar.svg" alt="Help" onclick="loadView('help', 'Help'); history.pushState(null, '', '#help');">
+                </div>
+                
+            </div>
+            <div id="user-info" >
+                <span id="user-name"  class="headerItem" style="display: none !important;">John Doe</span>
+                <img id="user-image" src="images/default-avatar.png" alt="John Doe" class="headerItem" style="display: none;">
             </div>
         </div>
     </header>
     
-    <div id="content" style="display: none;">
-        <!-- Aquí se cargarán dinámicamente las vistas solo si el usuario está autenticado -->
+    <div id="content">
     </div>
-
-    <!-- Carga de scripts -->
-
-    <script src="js/ui.js" defer></script>
-    <script src="js/views.js" defer></script>
-    <script src="js/appList.js" defer></script>
 </body>
+<script src="js/appList.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/views.js" defer></script>
+<script src="js/auth.js" defer></script>
 </html>

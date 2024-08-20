@@ -1,0 +1,27 @@
+/* Settings View Specific Styles */
+#settings-view {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+#settings-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+}
+
+#settings-container h2 {
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+#settings-subcontainer {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+}
