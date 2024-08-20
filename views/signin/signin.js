@@ -30,7 +30,7 @@ function handleCredentialResponse(response) {
     // Mostrar el contenido de la página si está autenticado
     // Obtener todos los elementos con la clase 'headerItem'
     var elements = document.getElementsByClassName('headerItem');
-
+    console.log(elements)
     // Convertir la colección en un array y usar forEach
     elements.forEach( function(element) {
         element.style.display = 'block';
