@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         loadView('apps', 'Apps');
     }
+
     const id_token = sessionStorage.getItem('id_token');
     if (!id_token) {
         document.getElementById('content').style.display = 'none';

@@ -22,5 +22,11 @@ window.apps = [
         name: 'Apps',
         comment: 'Select an Application',
         group: 'home'
+    },
+    {
+        id: 'signin',
+        name: 'Sign in',
+        comment: 'Google SSO',
+        group: 'public'
     }
 ];

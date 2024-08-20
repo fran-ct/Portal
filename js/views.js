@@ -34,15 +34,6 @@ function loadView(viewName, viewTitle) {
             };
             document.body.appendChild(script);
 
-            // Si estamos en la vista de Apps, cargamos appList.js
-            if (viewName === 'apps') {
-                const appListScript = document.createElement('script');
-                appListScript.src = 'js/appList.js';
-                appListScript.defer = true;
-                appListScript.setAttribute('data-view-script', '');
-                document.body.appendChild(appListScript);
-            }
-
             // Actualizar el título de la página
             document.title = viewTitle;
         })
