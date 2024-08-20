@@ -24,5 +24,3 @@ window.apps = [
         group: 'home'
     }
 ];
-
-console.log("appList.js loaded successfully", window.apps);
