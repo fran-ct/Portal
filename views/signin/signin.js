@@ -9,9 +9,10 @@ function initializeView() {
 
 
     google.accounts.id.renderButton(
-        document.getElementById("g_id_onload"),
-        { theme: "outline", size: "large" }  // customization attributes
+        document.getElementById("signInButton"),
+        { theme: "outline", size: "large", text:"signin",shape:"pill" }  // customization attributes
     );
+
     google.accounts.id.prompt();
 
 }
@@ -20,17 +21,17 @@ function handleCredentialResponse(response) {
     console.log("LOGGEO!!!!")
     const credential = response.credential;
     const profile = parseJwt(credential);
+    console.log(profile)
 
     // Guardar el token en el almacenamiento local si es necesario
     sessionStorage.setItem('id_token', credential);
 
     // Mostrar el contenido de la página si está autenticado
-    document.getElementById('headerItem').style.display = 'block';
+    document.getElementsByClassName('headerItem').style.display = 'block';
 
     // Cargar la vista principal
     loadView('apps', 'Apps');
 
-    console.log(profile)
     // Actualizar la interfaz con la información del usuario
     document.getElementById('user-name').textContent = profile.name;
     document.getElementById('user-image').src = profile.picture;
