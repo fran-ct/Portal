@@ -21,6 +21,7 @@ function handleCredentialResponse(response) {
     console.log("LOGGEO!!!!")
     const credential = response.credential;
     const profile = parseJwt(credential);
+    console.log("profile")
     console.log(profile)
 
     // Guardar el token en el almacenamiento local si es necesario
