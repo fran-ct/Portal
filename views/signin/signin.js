@@ -32,7 +32,7 @@ function handleCredentialResponse(response) {
     var elements = document.getElementsByClassName('headerItem');
     console.log(elements)
     // Convertir la colección en un array y usar forEach
-    elements.forEach( function(element) {
+    elements.forEach( (element) =>{
         element.style.display = 'block';
     });
 
