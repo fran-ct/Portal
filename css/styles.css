@@ -106,13 +106,6 @@ header {
         color: #e0e0e0 !important;
     }
 
-    #menu div img {
-        filter: invert(1) !important;
-    }
-
-    #user-info img {
-        filter: invert(1) !important; /* Invertir los colores para que el avatar sea blanco en modo oscuro */
-    }
 }
 
 

@@ -7,13 +7,13 @@ function initializeView() {
         callback: handleCredentialResponse
     });
 
-
+    google.accounts.id.prompt();
     google.accounts.id.renderButton(
         document.getElementById("signInButton"),
         { theme: "outline", size: "large", text:"signin",shape:"pill" }  // customization attributes
     );
 
-    google.accounts.id.prompt();
+
 
 }
 
@@ -31,7 +31,7 @@ function handleCredentialResponse(response) {
     // Obtener todos los elementos con la clase 'headerItem'
 
     const elements = document.getElementsByClassName("headerItem");
-    Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'none');
+    Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
     
     // Cargar la vista principal
     loadView('apps', 'Apps');
@@ -39,6 +39,7 @@ function handleCredentialResponse(response) {
     // Actualizar la interfaz con la información del usuario
     document.getElementById('user-name').textContent = profile.name;
     document.getElementById('user-image').src = profile.picture;
+    document.getElementById('user-image').alt = profile.email;
 }
 
 function parseJwt(token) {
