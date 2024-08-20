@@ -31,9 +31,8 @@ function handleCredentialResponse(response) {
     // Obtener todos los elementos con la clase 'headerItem'
 
     const elements = document.getElementsByClassName("headerItem");
-    Array.prototype.forEach.call(elements,(elem) => elem.style = 'display="none"',
-    );
-
+    Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'none');
+    
     // Cargar la vista principal
     loadView('apps', 'Apps');
 
