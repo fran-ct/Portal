@@ -31,7 +31,7 @@ function handleCredentialResponse(response) {
     var elements = document.getElementsByClassName('headerItem');
 
     // Convertir la colección en un array y usar forEach
-    Array.prototype.forEach.call(elements, function(element) {
+    elements.forEach( function(element) {
         element.style.display = 'block';
     });
 
