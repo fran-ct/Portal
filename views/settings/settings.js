@@ -20,7 +20,7 @@ function initializeView() {
                 method: 'POST',
                 
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'text/plain'
                 },
                 body: JSON.stringify({ token: token })
             })
@@ -50,7 +50,7 @@ function initializeView() {
             method: 'GET',
             credentials: "omit",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain'
             }
         })
         .then(response => response.json())

@@ -29,7 +29,7 @@ function loadAvailableCalendars() {
         credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'text/plain'
         }
     })
     .then(response => response.json())
@@ -66,7 +66,7 @@ function filterEvents() {
         credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'text/plain'
         },
         body: JSON.stringify({ date: date, calendarId: calendarId })
     })
@@ -129,7 +129,7 @@ function loadIssuesFromBackend() {
         credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'text/plain'
         }
     })
     .then(response => response.json())
@@ -266,7 +266,7 @@ document.getElementById('syncButton').addEventListener('click', function() {
         credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'text/plain'
         },
         body: JSON.stringify({
             issueKey: selectedIssue.key,

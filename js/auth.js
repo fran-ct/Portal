@@ -16,7 +16,7 @@ function handleCredentialResponse(response) {
     credentials: "omit",
     redirect: "follow", // Seguir redirecciones automáticamente
     headers: {
-      'Content-Type': 'application/json', // Enviar datos en formato JSON
+      'Content-Type': 'text/plain', // Enviar datos en formato JSON
     },
     body: JSON.stringify({ token: credential }) // El cuerpo de la solicitud, con el token de autenticación
   })
