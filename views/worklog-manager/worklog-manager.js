@@ -29,7 +29,7 @@ function loadAvailableCalendars() {
         mode: 'no-cors',
         redirect: "follow",
         headers: {
-            'Content-Type': 'text/plain',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         }
     })
@@ -67,7 +67,7 @@ function filterEvents() {
         mode: 'no-cors',
         redirect: "follow",
         headers: {
-            'Content-Type': 'text/plain',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         },
         body: JSON.stringify({ date: date, calendarId: calendarId })
@@ -131,7 +131,7 @@ function loadIssuesFromBackend() {
         mode: 'no-cors',
         redirect: "follow",
         headers: {
-            'Content-Type': 'text/plain',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         }
     })
@@ -269,7 +269,7 @@ document.getElementById('syncButton').addEventListener('click', function() {
         mode: 'no-cors',
         redirect: "follow",
         headers: {
-            'Content-Type': 'text/plain',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         },
         body: JSON.stringify({
