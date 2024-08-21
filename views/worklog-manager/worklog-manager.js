@@ -28,7 +28,7 @@ function loadAvailableCalendars() {
         method: 'POST',
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         }
     })
@@ -65,7 +65,7 @@ function filterEvents() {
         method: 'POST',
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         },
         body: JSON.stringify({ date: date, calendarId: calendarId })
@@ -128,7 +128,7 @@ function loadIssuesFromBackend() {
         method: 'POST',
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         }
     })
@@ -265,7 +265,7 @@ document.getElementById('syncButton').addEventListener('click', function() {
         method: 'POST',
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
         },
         body: JSON.stringify({

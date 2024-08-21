@@ -15,7 +15,7 @@ function handleCredentialResponse(response) {
     method: 'POST',
     redirect: "follow",
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'text/plain'
     },
     body: JSON.stringify({ token: credential })
   })
