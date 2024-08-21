@@ -13,11 +13,10 @@ function handleCredentialResponse(response) {
   // Enviar el ID token al backend para su validación
   fetch(BACKEND_URL + '/api/authenticate', {
     method: 'POST', // Método POST para enviar datos al backend
-    mode: 'cors', // Habilitar CORS, importante si el backend está en un dominio diferente
+    credentials: "omit",
     redirect: "follow", // Seguir redirecciones automáticamente
     headers: {
       'Content-Type': 'application/json', // Enviar datos en formato JSON
-      'Authorization': `Bearer ${sessionStorage.getItem('id_token')}` // Incluir el ID token en el encabezado Authorization (opcional)
     },
     body: JSON.stringify({ token: credential }) // El cuerpo de la solicitud, con el token de autenticación
   })

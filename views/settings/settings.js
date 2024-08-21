@@ -20,8 +20,7 @@ function initializeView() {
                 method: 'POST',
                 
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ token: token })
             })
@@ -49,9 +48,9 @@ function initializeView() {
     function checkStoredToken() {
         fetch(`${BACKEND_URL}/api/checkJiraToken`, {
             method: 'GET',
-            
+            credentials: "omit",
             headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+                'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())

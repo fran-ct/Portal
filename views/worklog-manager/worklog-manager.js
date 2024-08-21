@@ -26,11 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadAvailableCalendars() {
     fetch(BACKEND_URL+'/api/getAvailableCalendars', {
         method: 'POST',
-        
+        credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+            'Content-Type': 'application/json'
         }
     })
     .then(response => response.json())
@@ -64,11 +63,10 @@ function filterEvents() {
 
     fetch(BACKEND_URL+'/api/getEvents', {
         method: 'POST',
-        
+        credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ date: date, calendarId: calendarId })
     })
@@ -128,11 +126,10 @@ function selectEvent(eventId) {
 function loadIssuesFromBackend() {
     fetch(BACKEND_URL+'/api/getJiraIssues', {
         method: 'POST',
-        
+        credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+            'Content-Type': 'application/json'
         }
     })
     .then(response => response.json())
@@ -266,11 +263,10 @@ document.getElementById('syncButton').addEventListener('click', function() {
     
     fetch(BACKEND_URL+'/api/setIssueWorklog', {
         method: 'POST',
-        
+        credentials: "omit",
         redirect: "follow",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             issueKey: selectedIssue.key,
