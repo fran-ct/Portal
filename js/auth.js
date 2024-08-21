@@ -1,14 +1,5 @@
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com"
 
-google.accounts.id.initialize({
-  client_id: CLIENT_ID,
-  callback: handleCredentialResponse
-});
-
-
-
-
-
 
 
 function handleCredentialResponse(response) {
@@ -31,6 +22,7 @@ function handleCredentialResponse(response) {
   // Actualizar la interfaz con la información del usuario
   document.getElementById('user-name').textContent = profile.name;
   document.getElementById('user-image').src = profile.picture;
+  document.getElementById('user-image').style.filter = 'none';
   document.getElementById('user-image').alt = profile.email;
 }
 
@@ -42,3 +34,9 @@ function parseJwt(token) {
   return JSON.parse(base64);
 }
 
+
+google.accounts.id.initialize({
+  client_id: CLIENT_ID,
+  callback: handleCredentialResponse
+});
+google.accounts.id.prompt();
