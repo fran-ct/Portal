@@ -18,7 +18,6 @@ function initializeView() {
             // Enviar el token al backend
             fetch(`${BACKEND_URL}/api/saveJiraToken`, {
                 method: 'POST',
-                
                 headers: {
                     'Content-Type': 'text/plain'
                 },

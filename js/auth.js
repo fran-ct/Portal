@@ -1,8 +1,29 @@
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com"
 
 
-
 function handleCredentialResponse(response) {
+  console.log("[APP] Logged ;)");
+  const credential = response.credential;
+  const profile = parseJwt(credential);
+
+
+      // Mostrar el contenido de la página si está autenticado
+      const elements = document.getElementsByClassName("headerItem");
+      Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
+
+      // Cargar la vista principal
+      loadView('apps', 'Apps');
+
+      // Actualizar la interfaz con la información del usuario
+      document.getElementById('user-name').textContent = profile.name;
+      document.getElementById('user-image').src = profile.picture;
+      document.getElementById('user-image').style.filter = 'none';
+      document.getElementById('user-image').alt = profile.email;
+
+}
+
+
+function handleCredentialResponseCOMPLETE(response) {
   console.log("[APP] Logged ;)");
   const credential = response.credential;
   const profile = parseJwt(credential);
