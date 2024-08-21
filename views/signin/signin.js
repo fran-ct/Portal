@@ -2,12 +2,9 @@ var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleuserco
 
 function initializeView() {
 
-    google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleCredentialResponse
-    });
 
-    google.accounts.id.prompt();
+
+    
     google.accounts.id.renderButton(
         document.getElementById("signInButton"),
         { theme: "outline", size: "large", text:"signin",shape:"pill" }  // customization attributes
