@@ -18,6 +18,7 @@ function initializeView() {
             // Enviar el token al backend
             fetch(`${BACKEND_URL}/api/saveJiraToken`, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
@@ -48,6 +49,7 @@ function initializeView() {
     function checkStoredToken() {
         fetch(`${BACKEND_URL}/api/checkJiraToken`, {
             method: 'GET',
+            mode: 'no-cors',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
             }

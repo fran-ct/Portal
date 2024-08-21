@@ -13,6 +13,7 @@ function handleCredentialResponse(response) {
   // Enviar el ID token al backend para su validación
   fetch(BACKEND_URL+'/api/authenticate', {
     method: 'POST',
+    mode: 'no-cors',
     redirect: "follow",
     headers: {
       'Content-Type': 'text/plain'

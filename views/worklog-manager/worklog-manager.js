@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadAvailableCalendars() {
     fetch(BACKEND_URL+'/api/getAvailableCalendars', {
         method: 'POST',
+        mode: 'no-cors',
         redirect: "follow",
         headers: {
             'Content-Type': 'text/plain',
@@ -63,6 +64,7 @@ function filterEvents() {
 
     fetch(BACKEND_URL+'/api/getEvents', {
         method: 'POST',
+        mode: 'no-cors',
         redirect: "follow",
         headers: {
             'Content-Type': 'text/plain',
@@ -126,6 +128,7 @@ function selectEvent(eventId) {
 function loadIssuesFromBackend() {
     fetch(BACKEND_URL+'/api/getJiraIssues', {
         method: 'POST',
+        mode: 'no-cors',
         redirect: "follow",
         headers: {
             'Content-Type': 'text/plain',
@@ -263,6 +266,7 @@ document.getElementById('syncButton').addEventListener('click', function() {
     
     fetch(BACKEND_URL+'/api/setIssueWorklog', {
         method: 'POST',
+        mode: 'no-cors',
         redirect: "follow",
         headers: {
             'Content-Type': 'text/plain',
