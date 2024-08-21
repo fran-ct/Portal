@@ -11,7 +11,7 @@ function handleCredentialResponse(response) {
   sessionStorage.setItem('id_token', credential);
 
   // Enviar el ID token al backend para su validación
-  fetch('https://your-backend-url.com/api/authenticate', {
+  fetch(BACKEND_URL+'/api/authenticate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
