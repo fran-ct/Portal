@@ -164,32 +164,7 @@ button:disabled {
 }
 
 
-/* Adjustments for Dark Mode */
-@media (prefers-color-scheme: dark) {
 
-    .container {
-        background-color: #1e1e1e;
-    }
-
-    .filter,
-    .issues,
-    .events {
-        background-color: #1e1e1e;
-    }
-
-    th {
-        background-color: #333;
-        color: #e0e0e0;
-    }
-
-    td {
-        color: #b3b3b3;
-    }
-
-    tr:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-}
 
 
 @media (max-width: 768px) {
