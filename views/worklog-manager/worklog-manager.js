@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadAvailableCalendars() {
     fetch(BACKEND_URL+'/api/getAvailableCalendars', {
         method: 'POST',
+        redirect: "follow",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
@@ -62,6 +63,7 @@ function filterEvents() {
 
     fetch(BACKEND_URL+'/api/getEvents', {
         method: 'POST',
+        redirect: "follow",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
@@ -124,6 +126,7 @@ function selectEvent(eventId) {
 function loadIssuesFromBackend() {
     fetch(BACKEND_URL+'/api/getJiraIssues', {
         method: 'POST',
+        redirect: "follow",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
@@ -260,6 +263,7 @@ document.getElementById('syncButton').addEventListener('click', function() {
     
     fetch(BACKEND_URL+'/api/setIssueWorklog', {
         method: 'POST',
+        redirect: "follow",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('id_token')}`
