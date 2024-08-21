@@ -1,6 +1,6 @@
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com"
 
-console.log("VER:" + "1.6")
+console.log("VER:" + "1.7")
 
 document.addEventListener('DOMContentLoaded', function() {
     const currentHash = window.location.hash.substring(1); // Elimina el '#' del hash

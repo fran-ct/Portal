@@ -12,9 +12,7 @@ function handleCredentialResponse(response) {
 
   // Enviar el ID token al backend para su validación
   fetch(BACKEND_URL + '/api/authenticate', {
-    method: 'POST', 
-    credentials: "omit",
-    charset: "utf-8",
+    method: 'POST',
     headers: {
       'Content-Type': 'text/plain', 
     },
