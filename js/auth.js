@@ -3,27 +3,41 @@ var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleuserco
 
 
 function handleCredentialResponse(response) {
-  console.log("[APP] Logged ;)")
+  console.log("[APP] Logged ;)");
   const credential = response.credential;
   const profile = parseJwt(credential);
 
   // Guardar el token en el almacenamiento local si es necesario
   sessionStorage.setItem('id_token', credential);
 
-  // Mostrar el contenido de la página si está autenticado
-  // Obtener todos los elementos con la clase 'headerItem'
+  // Enviar el ID token al backend para su validación
+  fetch('https://your-backend-url.com/api/authenticate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ token: credential })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Mostrar el contenido de la página si está autenticado
+      const elements = document.getElementsByClassName("headerItem");
+      Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
 
-  const elements = document.getElementsByClassName("headerItem");
-  Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
-  
-  // Cargar la vista principal
-  loadView('apps', 'Apps');
+      // Cargar la vista principal
+      loadView('apps', 'Apps');
 
-  // Actualizar la interfaz con la información del usuario
-  document.getElementById('user-name').textContent = profile.name;
-  document.getElementById('user-image').src = profile.picture;
-  document.getElementById('user-image').style.filter = 'none';
-  document.getElementById('user-image').alt = profile.email;
+      // Actualizar la interfaz con la información del usuario
+      document.getElementById('user-name').textContent = profile.name;
+      document.getElementById('user-image').src = profile.picture;
+      document.getElementById('user-image').style.filter = 'none';
+      document.getElementById('user-image').alt = profile.email;
+    } else {
+      console.error('Error en la autenticación del backend:', data.message);
+    }
+  })
+  .catch(error => console.error('Error al comunicar con el backend:', error));
 }
 
 function parseJwt(token) {
@@ -33,7 +47,6 @@ function parseJwt(token) {
   }).join(''));
   return JSON.parse(base64);
 }
-
 
 google.accounts.id.initialize({
   client_id: CLIENT_ID,

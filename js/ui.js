@@ -17,6 +17,3 @@ function getAppNameById(id) {
     return app ? app.name : 'Unknown';
 }
 
-
-document.documentElement.style.setProperty('color-scheme', 'dark');
-document.body.classList.add('dark-mode');

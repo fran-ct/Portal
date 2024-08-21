@@ -1,17 +1,23 @@
 /* Settings View Specific Styles */
 #settings-view {
     display: flex;
-    justify-content: center;
-    padding: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    flex-direction: column;
+    align-items: center;
 }
 
 #settings-container {
-    width: 100%;
+    min-width: 500px;
     max-width: 800px;
     background-color: #1e1e1e;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
 #settings-container h2 {
@@ -24,4 +30,16 @@
     color: #e0e0e0;
     padding: 15px;
     border-radius: 8px;
+}
+
+.container a {
+    color: grey;
+}
+
+.container input {
+    width: 100%;
+    padding: 0.3rem;
+    background-color: #444;
+    border: none;
+    color: #e0e0e0;
 }

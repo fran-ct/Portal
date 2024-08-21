@@ -1,8 +1,12 @@
 <div class="app settings-view" id="settings-view">
+    <h2>Settings</h2>
     <div class="container z-depth-3" id="settings-container">
-        <h2>Settings</h2>
-        <div class="sub-container" id="settings-subcontainer">
-            <p>Adjust your Portal settings here.</p>
+        <p>Set your Jira token</p>
+        <div id="token-status">
+            <input type="text" id="token" placeholder="Insert your Jira token to start">
+            <button type="submit" id="token-btn">Save</button>
+            <span id="token-indicator" style="display: none;"></span>
         </div>
+        <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">Get your Jira token here</a>
     </div>
 </div>
