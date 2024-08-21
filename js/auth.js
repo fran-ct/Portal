@@ -1,7 +1,7 @@
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com"
 
 
-function handleCredentialResponse(response) {
+function handleCredentialResponse2(response) {
   console.log("[APP] Logged ;)");
   const credential = response.credential;
   const profile = parseJwt(credential);
@@ -23,7 +23,7 @@ function handleCredentialResponse(response) {
 }
 
 
-function handleCredentialResponseCOMPLETE(response) {
+function handleCredentialResponse(response) {
   console.log("[APP] Logged ;)");
   const credential = response.credential;
   const profile = parseJwt(credential);
@@ -34,6 +34,7 @@ function handleCredentialResponseCOMPLETE(response) {
   // Enviar el ID token al backend para su validación
   fetch(BACKEND_URL + '/api/authenticate', {
     method: 'POST',
+    redirect: 'follow',
     headers: {
       'Content-Type': 'text/plain', 
     },
