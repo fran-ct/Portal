@@ -11,15 +11,22 @@ function handleCredentialResponse(response) {
   sessionStorage.setItem('id_token', credential);
 
   // Enviar el ID token al backend para su validación
-  fetch(BACKEND_URL+'/api/authenticate', {
-    method: 'POST',
-    redirect: "follow",
+  fetch(BACKEND_URL + '/api/authenticate', {
+    method: 'POST', // Método POST para enviar datos al backend
+    mode: 'cors', // Habilitar CORS, importante si el backend está en un dominio diferente
+    redirect: "follow", // Seguir redirecciones automáticamente
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json', // Enviar datos en formato JSON
+      'Authorization': `Bearer ${sessionStorage.getItem('id_token')}` // Incluir el ID token en el encabezado Authorization (opcional)
     },
-    body: JSON.stringify({ token: credential })
+    body: JSON.stringify({ token: credential }) // El cuerpo de la solicitud, con el token de autenticación
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json(); // Procesar la respuesta como JSON
+  })
   .then(data => {
     if (data.success) {
       // Mostrar el contenido de la página si está autenticado
@@ -40,6 +47,7 @@ function handleCredentialResponse(response) {
   })
   .catch(error => console.error('Error al comunicar con el backend:', error));
 }
+
 
 function parseJwt(token) {
   const base64Url = token.split('.')[1];
