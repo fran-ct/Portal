@@ -12,13 +12,13 @@ function handleCredentialResponse(response) {
 
   // Enviar el ID token al backend para su validación
   fetch(BACKEND_URL + '/api/authenticate', {
-    method: 'POST', // Método POST para enviar datos al backend
+    method: 'POST', 
     credentials: "omit",
-    redirect: "follow", // Seguir redirecciones automáticamente
+    charset: "utf-8",
     headers: {
-      'Content-Type': 'text/plain', // Enviar datos en formato JSON
+      'Content-Type': 'text/plain', 
     },
-    body: JSON.stringify({ token: credential }) // El cuerpo de la solicitud, con el token de autenticación
+    body: JSON.stringify({ token: credential })
   })
   .then(response => {
     if (!response.ok) {
