@@ -31,14 +31,15 @@ function handleCredentialResponse(response) {
   // Guardar el token en el almacenamiento local si es necesario
   sessionStorage.setItem('id_token', credential);
 
-  // Enviar el ID token al backend para su validación
-  fetch(BACKEND_URL + '/api/authenticate', {
-    method: 'POST',
-    redirect: 'follow',
-    headers: {
-      'Content-Type': 'text/plain', 
-    },
-    body: JSON.stringify({ token: credential })
+  // Enviar el ID token al backend para su validación a través de una solicitud GET
+  const params = new URLSearchParams({
+    action: 'authenticate',
+    token: credential
+  });
+
+  fetch(`${BACKEND_URL}/api/authenticate?${params.toString()}`, {
+    method: 'GET', // Cambiado a GET
+    redirect: 'follow'
   })
   .then(response => {
     if (!response.ok) {
@@ -66,6 +67,7 @@ function handleCredentialResponse(response) {
   })
   .catch(error => console.error('Error al comunicar con el backend:', error));
 }
+
 
 
 function parseJwt(token) {

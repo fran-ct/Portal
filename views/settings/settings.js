@@ -16,13 +16,9 @@ function initializeView() {
             toggleFormState(true);
     
             // Enviar el token al backend
-            fetch(`${BACKEND_URL}/api/saveJiraToken`, {
-                method: 'POST',
-                redirect: 'follow',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: JSON.stringify({ token: token })
+            fetch(`${BACKEND_URL}/api/authenticate?${params.toString()}`, {
+                method: 'GET', // Cambiado a GET
+                redirect: 'follow'
             })
             .then(response => response.json())
             .then(data => {

@@ -3,7 +3,7 @@ function initializeView() {
 
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Cargar los calendarios disponibles y los eventos del día
     loadAvailableCalendars();
     filterEvents();
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadAvailableCalendars() {
-    fetch(BACKEND_URL+'/api/getAvailableCalendars', {
+    fetch(BACKEND_URL + '/api/getAvailableCalendars', {
         method: 'POST',
         credentials: "omit",
         redirect: "follow",
@@ -32,18 +32,18 @@ function loadAvailableCalendars() {
             'Content-Type': 'text/plain'
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            populateCalendars(data.data.calendars);
-            document.getElementById('calendar-select').value = data.data.defaultCalendar.id;
-        } else {
-            showError('Error loading calendars.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with the backend while loading calendars.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateCalendars(data.data.calendars);
+                document.getElementById('calendar-select').value = data.data.defaultCalendar.id;
+            } else {
+                showError('Error loading calendars.');
+            }
+        })
+        .catch(error => {
+            showError('Error communicating with the backend while loading calendars.');
+        });
 }
 
 function populateCalendars(calendars) {
@@ -61,26 +61,21 @@ function filterEvents() {
     const date = document.getElementById('date-input').value;
     const calendarId = document.getElementById('calendar-select').value;
 
-    fetch(BACKEND_URL+'/api/getEvents', {
-        method: 'POST',
-        credentials: "omit",
-        redirect: "follow",
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify({ date: date, calendarId: calendarId })
+    fetch(`${BACKEND_URL}/api/getEvents?${params.toString()}`, {
+        method: 'GET', // Cambiado a GET
+        redirect: 'follow'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateEventsList(data.events);
-        } else {
-            showError('Error loading events.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with the backend while loading events.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateEventsList(data.events);
+            } else {
+                showError('Error loading events.');
+            }
+        })
+        .catch(error => {
+            showError('Error communicating with the backend while loading events.');
+        });
 }
 
 function updateEventsList(events) {
@@ -108,7 +103,7 @@ function updateEventsList(events) {
 
     // Configurar el evento de selección de fila
     document.querySelectorAll('.event-row').forEach(row => {
-        row.addEventListener('click', function() {
+        row.addEventListener('click', function () {
             selectEvent(row.id);
         });
     });
@@ -124,7 +119,7 @@ function selectEvent(eventId) {
 }
 
 function loadIssuesFromBackend() {
-    fetch(BACKEND_URL+'/api/getJiraIssues', {
+    fetch(BACKEND_URL + '/api/getJiraIssues', {
         method: 'POST',
         credentials: "omit",
         redirect: "follow",
@@ -132,19 +127,19 @@ function loadIssuesFromBackend() {
             'Content-Type': 'text/plain'
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            issues = data.issues;
-            populateIssueFilters(issues);
-            updateIssuesTable(issues);
-        } else {
-            showError('Error loading issues.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with the backend while loading issues.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                issues = data.issues;
+                populateIssueFilters(issues);
+                updateIssuesTable(issues);
+            } else {
+                showError('Error loading issues.');
+            }
+        })
+        .catch(error => {
+            showError('Error communicating with the backend while loading issues.');
+        });
 }
 
 function populateIssueFilters(issues) {
@@ -228,7 +223,7 @@ function updateIssuesTable(filteredIssues) {
 
     // Configurar el evento de selección de fila
     document.querySelectorAll('.issue-row').forEach(row => {
-        row.addEventListener('click', function() {
+        row.addEventListener('click', function () {
             selectIssue(row.id);
         });
     });
@@ -246,7 +241,7 @@ function selectIssue(issueId) {
 
 function removeDups(list) {
     let unique = {};
-    list.forEach(function(i) {
+    list.forEach(function (i) {
         unique[i] = true;
     });
     return Object.keys(unique);
@@ -257,11 +252,11 @@ function showError(message) {
     // Puedes implementar un sistema de notificación visual aquí si lo deseas.
 }
 
-document.getElementById('syncButton').addEventListener('click', function() {
+document.getElementById('syncButton').addEventListener('click', function () {
     const comment = document.getElementById('selectedEventComment').value;
     const duration = moment.duration(moment(selectedEvent.endTime).diff(moment(selectedEvent.startTime))).asSeconds();
-    
-    fetch(BACKEND_URL+'/api/setIssueWorklog', {
+
+    fetch(BACKEND_URL + '/api/setIssueWorklog', {
         method: 'POST',
         credentials: "omit",
         redirect: "follow",
@@ -275,20 +270,20 @@ document.getElementById('syncButton').addEventListener('click', function() {
             started: moment(selectedEvent.startTime).toISOString().replace("Z", "-0000")
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-            document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
-            document.getElementById('selectedEventComment').value = '';
-            showSuccess('Worklog uploaded successfully.');
-        } else {
-            showError('Error uploading worklog: ' + data.message);
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with the backend while uploading worklog.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
+                document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
+                document.getElementById('selectedEventComment').value = '';
+                showSuccess('Worklog uploaded successfully.');
+            } else {
+                showError('Error uploading worklog: ' + data.message);
+            }
+        })
+        .catch(error => {
+            showError('Error communicating with the backend while uploading worklog.');
+        });
 });
 
 function showSuccess(message) {
