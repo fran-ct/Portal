@@ -31,11 +31,3 @@ function parseJwt(token) {
     return JSON.parse(base64);
 }
 
-// Inicializar Google One Tap
-google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: handleCredentialResponse
-});
-
-// Mostrar el prompt de Google One Tap
-google.accounts.id.prompt();
