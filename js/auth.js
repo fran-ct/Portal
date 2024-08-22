@@ -1,85 +1,41 @@
-var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com"
-
+var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
 
 function handleCredentialResponse(response) {
-  console.log("[APP] Logged ;)");
-  const credential = response.credential;
-  const profile = parseJwt(credential);
+    console.log("[APP] Logged ;)");
+    const credential = response.credential;
+    const profile = parseJwt(credential);
 
+    // Guardar el token en la base de datos encriptada
+    const appManager = new AppManager('my-global-secret-key');
+    appManager.encryptedDB.set('google_id_token', credential);
 
-      // Mostrar el contenido de la página si está autenticado
-      const elements = document.getElementsByClassName("headerItem");
-      Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
+    // Mostrar el contenido de la página si está autenticado
+    const elements = document.getElementsByClassName("headerItem");
+    Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
 
-      // Cargar la vista principal
-      loadView('apps', 'Apps');
+    // Cargar la vista principal
+    loadView('apps', 'Apps');
 
-      // Actualizar la interfaz con la información del usuario
-      document.getElementById('user-name').textContent = profile.name;
-      document.getElementById('user-image').src = profile.picture;
-      document.getElementById('user-image').style.filter = 'none';
-      document.getElementById('user-image').alt = profile.email;
-
+    // Actualizar la interfaz con la información del usuario
+    document.getElementById('user-name').textContent = profile.name;
+    document.getElementById('user-image').src = profile.picture;
+    document.getElementById('user-image').style.filter = 'none';
+    document.getElementById('user-image').alt = profile.email;
 }
-
-
-function handleCredentialResponse2(response) {
-  console.log("[APP] Logged ;)");
-  const credential = response.credential;
-  const profile = parseJwt(credential);
-
-  // Guardar el token en el almacenamiento local si es necesario
-  sessionStorage.setItem('id_token', credential);
-
-  // Enviar el ID token al backend para su validación a través de una solicitud GET
-  const params = new URLSearchParams({
-    action: 'authenticate',
-    token: credential
-  });
-
-  fetch(`${BACKEND_URL}/api/authenticate?${params.toString()}`, {
-    method: 'GET', // Cambiado a GET
-    redirect: 'follow'
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    return response.json(); // Procesar la respuesta como JSON
-  })
-  .then(data => {
-    if (data.success) {
-      // Mostrar el contenido de la página si está autenticado
-      const elements = document.getElementsByClassName("headerItem");
-      Array.prototype.forEach.call(elements, (elem) => elem.style.display = 'block');
-
-      // Cargar la vista principal
-      loadView('apps', 'Apps');
-
-      // Actualizar la interfaz con la información del usuario
-      document.getElementById('user-name').textContent = profile.name;
-      document.getElementById('user-image').src = profile.picture;
-      document.getElementById('user-image').style.filter = 'none';
-      document.getElementById('user-image').alt = profile.email;
-    } else {
-      console.error('Error en la autenticación del backend:', data.message);
-    }
-  })
-  .catch(error => console.error('Error al comunicar con el backend:', error));
-}
-
-
 
 function parseJwt(token) {
-  const base64Url = token.split('.')[1];
-  const base64 = decodeURIComponent(atob(base64Url).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-  return JSON.parse(base64);
+    const base64Url = token.split('.')[1];
+    const base64 = decodeURIComponent(atob(base64Url).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(base64);
 }
 
+// Inicializar Google One Tap
 google.accounts.id.initialize({
-  client_id: CLIENT_ID,
-  callback: handleCredentialResponse
+    client_id: CLIENT_ID,
+    callback: handleCredentialResponse
 });
+
+// Mostrar el prompt de Google One Tap
 google.accounts.id.prompt();

@@ -36,8 +36,3 @@ window.apps = [
         group: 'system'
     }
 ];
-
-
-
-// Define la URL del backend como una variable global
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw9GdN5_yBl7E0JI3whqlqxddy5cEj86oZYcKjkz8i9IcvXRPz7Bhwb3xpRa5eiYJImng/exec'; // Cambia esta URL a la dirección de tu backend
