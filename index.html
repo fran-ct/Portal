@@ -9,8 +9,6 @@
     <script src="https://accounts.google.com/gsi/client" async></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/appList.js" defer></script>
-
 </head>
 <body>
     <header>
@@ -28,19 +26,22 @@
                 <div id="help" class="headerItem" style="display: none;">
                     <img src="images/help_toolbar.svg" alt="Help" onclick="loadView('help', 'Help'); history.pushState(null, '', '#help');">
                 </div>
-                
             </div>
             <div id="user-info" >
-                <span id="user-name"  class="headerItem" style="display: none !important;">John Doe</span>
+                <span id="user-name" class="headerItem" style="display: none !important;">John Doe</span>
                 <img id="user-image" src="images/default-avatar.png" alt="you" class="headerItem" style="display: none; filter: invert(1) !important" >
             </div>
         </div>
     </header>
     
-    <div id="content">
-    </div>
+    <div id="content"></div>
+
+    <!-- Archivos JS necesarios para la funcionalidad del frontend -->
+    <script src="js/storageDB.js" defer></script> <!-- Manejo del almacenamiento -->
+    <script src="js/appManager.js" defer></script> <!-- Manejo de la aplicación -->
+    <script src="js/auth.js" defer></script> <!-- Autenticación con Google -->
+    <script src="js/appList.js" defer></script> <!-- Lista de aplicaciones -->
+    <script src="js/ui.js" defer></script> <!-- Funciones de UI -->
+    <script src="js/views.js" defer></script> <!-- Manejo de vistas dinámicas -->
 </body>
-<script src="js/ui.js" defer></script>
-<script src="js/views.js" defer></script>
-<script src="js/auth.js" defer></script>
 </html>
