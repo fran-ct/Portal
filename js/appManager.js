@@ -34,7 +34,7 @@ class AppManager {
 
     promptGoogleSignIn() {
         google.accounts.id.initialize({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID',
+            client_id: CLIENT_ID,
             callback: this.handleGoogleSignIn.bind(this)
         });
         google.accounts.id.prompt();

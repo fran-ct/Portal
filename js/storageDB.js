@@ -1,3 +1,12 @@
+var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
+
+
+
+
+
+
+
+
 /**
  * Clase para gestionar una base de datos en localStorage con cifrado opcional.
  * Esta clase abstrae la interacción con localStorage, permitiendo almacenar y recuperar datos de forma segura.

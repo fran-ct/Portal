@@ -1,4 +1,4 @@
-var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
+
 
 function handleCredentialResponse(response) {
     console.log("[APP] Logged ;)");
