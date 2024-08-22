@@ -1,12 +1,24 @@
 <div class="app settings-view" id="settings-view">
     <h2>Settings</h2>
     <div class="container z-depth-3" id="settings-container">
-        <p>Set your Jira token</p>
-        <div id="token-status">
-            <input type="text" id="token" placeholder="Insert your Jira token to start">
-            <button type="submit" id="token-btn">Save</button>
-            <span id="token-indicator" style="display: none;"></span>
+        <p>Manage your API tokens:</p>
+        
+        <!-- Section for Jira Token Management -->
+        <div id="jira-token-section">
+            <h3>Jira Token</h3>
+            <div class="token-input-container">
+                <input type="password" id="jira-token-input" placeholder="Insert your Jira token to start">
+                <button type="button" id="toggle-jira-token-visibility" class="toggle-visibility">
+                    👁️
+                </button>
+            </div>
+            <button type="submit" id="save-jira-token-btn">Save</button>
+            <button type="button" id="delete-jira-token-btn">Delete</button>
+            <span id="jira-token-status" class="token-status"></span>
+            <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">Get your Jira token here</a>
         </div>
-        <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">Get your Jira token here</a>
+        
+        <!-- Section for other tokens (e.g., Notion, Slack) -->
+        <!-- You can duplicate the above section and modify it for different tokens -->
     </div>
 </div>
