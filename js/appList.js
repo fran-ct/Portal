@@ -21,7 +21,7 @@ window.apps = [
         id: 'apps',
         name: 'Apps',
         comment: 'Select an Application',
-        group: 'public'
+        group: 'system'
     },
     {
         id: 'signin',
