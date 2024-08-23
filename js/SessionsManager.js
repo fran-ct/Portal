@@ -51,14 +51,21 @@ class SessionManager {
         document.getElementById('user-image').alt = profile.email;
         document.getElementById('user-image').style.display = "block";
         document.getElementById('user-name').style.display = "block";
-        document.getElementById('user-apps').style.display = "block";
-        document.getElementById('user-help').style.display = "block";
-        document.getElementById('user-settings').style.display = "block";
+        document.getElementById('apps').style.display = "block";
+        document.getElementById('help').style.display = "block";
+        document.getElementById('settings').style.display = "block";
     }
 
     // Maneja la desconexión de la sesión
     logout() {
-        this.appManager.clearAllData();
-        this.promptGoogleSignIn();
+        const confirmation = confirm("Are you sure you want to log out? All stored data will be erased.");
+
+        if (confirmation) {
+            this.appManager.clearAllData();
+
+            this.appManager.loadView('signin', 'Sign In');
+
+            this.promptGoogleSignIn();
+        }
     }
 }
