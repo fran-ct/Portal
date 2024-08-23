@@ -10,14 +10,32 @@ class SessionManager {
             client_id: CLIENT_ID,
             callback: this.handleCredentialResponse.bind(this),
             scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
-            auto_select: true,
             ux_mode: "popup",
-            context: "signin",
-            cancel_on_tap_outside: true,
-            prompt_parent_id: "signInButtonContainer",
             auto_prompt: false
         });
-        this.promptGoogleSignIn();
+
+        this.checkSessionStatus()
+            .then((isActive) => {
+                if (!isActive) {
+                    this.promptGoogleSignIn();
+                } else {
+                    this.updateUIWithUserProfile();
+                }
+            })
+            .catch((error) => {
+                console.error("Error during session check: ", error);
+                this.promptGoogleSignIn();
+            });
+    }
+
+    // Verifica el estado de la sesión
+    async checkSessionStatus() {
+        const googleAccessToken = this.appManager.unencryptedDB.get('google_access_token');
+        if (googleAccessToken) {
+            const isValid = await this.validateAccessToken(googleAccessToken);
+            return isValid;
+        }
+        return false;
     }
 
     // Solicita el inicio de sesión si no hay una sesión activa
@@ -25,11 +43,7 @@ class SessionManager {
         if (this.authAttempted) return; // Evitar múltiples intentos
         this.authAttempted = true; // Marcar como que ya se intentó la autenticación
 
-        if (!this.isSessionActive()) {
-            google.accounts.id.prompt();
-        } else {
-            this.updateUIWithUserProfile();
-        }
+        google.accounts.id.prompt();
     }
 
     // Maneja la respuesta de credenciales de Google
@@ -118,7 +132,9 @@ class SessionManager {
 
         if (confirmation) {
             this.appManager.clearAllData();
+
             this.appManager.loadView('signin', 'Sign In');
+
             this.promptGoogleSignIn();
         }
     }
