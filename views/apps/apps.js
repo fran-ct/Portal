@@ -1,30 +1,22 @@
 function initializeView() {
-  loadApps();  // Cargar las aplicaciones disponibles
-}
+  const appListContainer = document.getElementById('apps-list');
+  const apps = window.apps.filter(app => app.group !== 'system');
 
-function loadApps() {
-  const appsList = document.getElementById('apps-list');
-  
-  if (!appsList) {
-      console.error('Elemento apps-list no encontrado');
-      return;
-  }
-
-  appsList.innerHTML = ''; // Limpia la lista de apps
-
-  window.apps.forEach(app => {
-    if(app.group!='blocked'){
-
+  apps.forEach(app => {
       const appItem = document.createElement('div');
       appItem.className = 'app-item';
-      appItem.innerHTML = `<h3>${app.name}</h3><p>${app.comment}</p>`;
-      
-      appItem.addEventListener('click', () => {
-        loadView(app.id, app.name);
-        history.pushState(null, '', `#${app.id}`);
-      });
-      
-      appsList.appendChild(appItem);
-    }
+      appItem.onclick = () => {
+          appManager.loadView(app.id, app.name);
+      };
+
+      const appTitle = document.createElement('h3');
+      appTitle.textContent = app.name;
+
+      const appDescription = document.createElement('p');
+      appDescription.textContent = app.comment;
+
+      appItem.appendChild(appTitle);
+      appItem.appendChild(appDescription);
+      appListContainer.appendChild(appItem);
   });
 }

@@ -1,13 +1,12 @@
 /* Settings View Specific Styles */
 #settings-view {
     display: flex;
-    padding-left: 20px;
-    padding-right: 20px;
     flex-direction: column;
     align-items: center;
+    gap: 20px;
 }
 
-#settings-container {
+.container {
     min-width: 500px;
     max-width: 800px;
     background-color: #1e1e1e;

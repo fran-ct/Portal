@@ -96,6 +96,7 @@ header {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     max-width: 1200px;
     background-color: #1e1e1e;
+    gap: 20px;
     color: #e0e0e0;
 }
 

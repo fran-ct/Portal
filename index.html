@@ -18,13 +18,13 @@
             </div>
             <div id="menu">
                 <div id="apps" class="headerItem">
-                    <img src="images/menu_toolbar.svg" alt="Apps Menu" onclick="loadView('apps', 'Apps'); history.pushState(null, '', '#apps');">
+                    <img src="images/menu_toolbar.svg" alt="Apps Menu" onclick="appManager.loadView('apps', 'Apps'); history.pushState(null, '', '#apps');">
                 </div>
                 <div id="settings" class="headerItem" style="display: none;">
-                    <img src="images/gear_toolbar.svg" alt="Settings" onclick="loadView('settings', 'Settings'); history.pushState(null, '', '#settings');">
+                    <img src="images/gear_toolbar.svg" alt="Settings" onclick="appManager.loadView('settings', 'Settings'); history.pushState(null, '', '#settings');">
                 </div>
                 <div id="help" class="headerItem" style="display: none;">
-                    <img src="images/help_toolbar.svg" alt="Help" onclick="loadView('help', 'Help'); history.pushState(null, '', '#help');">
+                    <img src="images/help_toolbar.svg" alt="Help" onclick="appManager.loadView('help', 'Help'); history.pushState(null, '', '#help');">
                 </div>
             </div>
             <div id="user-info" >
@@ -37,11 +37,10 @@
     <div id="content"></div>
 
     <!-- Archivos JS necesarios para la funcionalidad del frontend -->
+    <script src="js/appList.js" defer></script> <!-- Lista de aplicaciones -->
     <script src="js/storageDB.js" defer></script> <!-- Manejo del almacenamiento -->
     <script src="js/appManager.js" defer></script> <!-- Manejo de la aplicación -->
-    <script src="js/auth.js" defer></script> <!-- Autenticación con Google -->
-    <script src="js/appList.js" defer></script> <!-- Lista de aplicaciones -->
-    <script src="js/ui.js" defer></script> <!-- Funciones de UI -->
-    <script src="js/views.js" defer></script> <!-- Manejo de vistas dinámicas -->
+    <script src="js/index.js" defer></script> <!-- Lista de aplicaciones -->
+    <script src="js/SessionsManager.js" defer></script> <!-- Manejo de la aplicación -->
 </body>
 </html>

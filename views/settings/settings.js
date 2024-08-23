@@ -4,54 +4,65 @@ function initializeView() {
     const deleteJiraTokenBtn = document.getElementById('delete-jira-token-btn');
     const toggleJiraTokenVisibility = document.getElementById('toggle-jira-token-visibility');
     const jiraTokenStatus = document.getElementById('jira-token-status');
+    const logoutBtn = document.getElementById('logout-btn');
+    const clearDataBtn = document.getElementById('clear-data-btn');
 
     const encryptionKey = 'my-global-secret-key';
     const appManager = new AppManager(encryptionKey);
 
-    // Function to update the UI based on token status
-    function updateTokenStatus() {
-        const jiraToken = appManager.encryptedDB.get('jira_token');
-
-        if (jiraToken) {
-            jiraTokenStatus.textContent = 'Token stored.';
-            jiraTokenStatus.style.color = 'green';
-            jiraTokenInput.value = jiraToken;
-        } else {
-            jiraTokenStatus.textContent = 'No token stored.';
-            jiraTokenStatus.style.color = 'red';
-            jiraTokenInput.value = '';
-        }
+    // Verificar si el usuario está autenticado
+    const idToken = appManager.unencryptedDB.get('google_id_token');
+    if (!idToken) {
+        alert('You must be logged in to manage tokens.');
+        appManager.loadView('signin', 'Sign In');
+        return;
     }
 
-    // Toggle visibility of the Jira token input
-    toggleJiraTokenVisibility.addEventListener('click', () => {
-        const type = jiraTokenInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        jiraTokenInput.setAttribute('type', type);
-        toggleJiraTokenVisibility.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
-    });
+    // Mostrar el estado del token de Jira
+    if (appManager.encryptedDB.get('jira_token')) {
+        jiraTokenStatus.textContent = 'Token stored';
+        jiraTokenStatus.style.color = 'green';
+    } else {
+        jiraTokenStatus.textContent = 'No token stored';
+        jiraTokenStatus.style.color = 'red';
+    }
 
-    // Save Jira token
+    // Guardar el token de Jira
     saveJiraTokenBtn.addEventListener('click', () => {
-        const token = jiraTokenInput.value.trim();
-        if (token) {
-            appManager.encryptedDB.set('jira_token', token);
-            updateTokenStatus();
-            alert('Token saved successfully!');
-        } else {
-            alert('Please enter a valid token.');
-        }
+        const token = jiraTokenInput.value;
+        appManager.encryptedDB.set('jira_token', token);
+        jiraTokenStatus.textContent = 'Token stored';
+        jiraTokenStatus.style.color = 'green';
+        alert('Jira token saved successfully.');
     });
 
-    // Delete Jira token
+    // Eliminar el token de Jira
     deleteJiraTokenBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to delete the Jira token?')) {
-            appManager.encryptedDB.remove('jira_token');
-            updateTokenStatus();
-            alert('Token deleted successfully!');
-        }
+        appManager.encryptedDB.remove('jira_token');
+        jiraTokenStatus.textContent = 'No token stored';
+        jiraTokenStatus.style.color = 'red';
+        alert('Jira token deleted successfully.');
     });
 
-    // Initialize the UI
-    updateTokenStatus();
-}
+    // Cerrar sesión
+    logoutBtn.addEventListener('click', () => {
+        appManager.logout();
+    });
 
+    // Limpiar todos los datos locales
+    clearDataBtn.addEventListener('click', () => {
+        appManager.clearAllData();
+        alert('All data cleared.');
+    });
+
+    // Alternar la visibilidad del token de Jira
+    toggleJiraTokenVisibility.addEventListener('click', () => {
+        if (jiraTokenInput.type === 'password') {
+            jiraTokenInput.type = 'text';
+            toggleJiraTokenVisibility.textContent = 'Hide';
+        } else {
+            jiraTokenInput.type = 'password';
+            toggleJiraTokenVisibility.textContent = 'Show';
+        }
+    });
+}

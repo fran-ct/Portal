@@ -1,54 +1,74 @@
-// Este código se asegura de que la aplicación se inicialice correctamente
-document.addEventListener('DOMContentLoaded', () => {
-    const appManager = new AppManager('my-global-secret-key');
-    appManager.initializeApp();
-});
-
-
-
 class AppManager {
     constructor(encryptionKey) {
         this.encryptionKey = encryptionKey;
-        this.encryptedDB = new StorageDB(encryptionKey); // Base de datos encriptada por defecto
-        this.plainDB = new StorageDB(encryptionKey, 'plainDB', false); // Base de datos no encriptada
+        this.encryptedDB = new StorageDB(encryptionKey);
+        this.unencryptedDB = new StorageDB();
+        this.sessionManager = new SessionManager(this);
     }
 
+    // Inicializar la aplicación
     initializeApp() {
-        if (this.encryptedDB.shouldRefreshData()) {
-            this.promptGoogleSignIn();
+        this.sessionManager.initialize();
+        this.handleHashChange();
+    }
+
+    // Cargar la vista inicial
+    loadInitialView() {
+        if (!this.sessionManager.isSessionActive()) {
+            this.loadView('signin', 'Sign In');
         } else {
-            this.renderUserProfile();
-            this.renderAppContent();
+            this.loadView('apps', 'Apps');
         }
     }
 
-    renderUserProfile() {
-        const profile = this.encryptedDB.getUserProfile();
-        if (profile) {
-            document.getElementById('user-name').textContent = profile.name;
-            document.getElementById('user-image').src = profile.picture;
-            document.getElementById('user-image').style.filter = 'none';
-            document.getElementById('user-image').alt = profile.email;
-        }
+    // Cargar una vista específica
+    loadView(viewName, viewTitle) {
+        const contentDiv = document.getElementById('content');
+        contentDiv.style.opacity = 0; // Inicia la transición
+
+        setTimeout(() => {
+            fetch(`views/${viewName}/${viewName}.html`)
+                .then(response => response.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+                    contentDiv.style.opacity = 1; // Termina la transición
+
+                    const script = document.createElement('script');
+                    script.src = `views/${viewName}/${viewName}.js`;
+                    script.defer = true;
+                    script.onload = () => {
+                        if (typeof initializeView === 'function') {
+                            initializeView();
+                        }
+                    };
+                    document.body.appendChild(script);
+
+                    document.title = viewTitle;
+                })
+                .catch(error => console.error('Error al cargar la vista:', error));
+        }, 300); // Tiempo de la transición
     }
 
-    promptGoogleSignIn() {
-        google.accounts.id.initialize({
-            client_id: CLIENT_ID,
-            callback: this.handleGoogleSignIn.bind(this)
+    // Limpiar todos los datos
+    clearAllData() {
+        this.encryptedDB.clear();
+        this.unencryptedDB.clear();
+    }
+
+    // Método para manejar el cambio de hash
+    handleHashChange() {
+        window.addEventListener('hashchange', () => {
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash) {
+                const viewTitle = this.getAppNameById(currentHash);
+                this.loadView(currentHash, viewTitle);
+            }
         });
-        google.accounts.id.prompt();
     }
 
-    handleGoogleSignIn(response) {
-        const credential = response.credential;
-        this.encryptedDB.set('google_id_token', credential);
-        this.renderUserProfile();
-        this.renderAppContent();
-    }
-
-    renderAppContent() {
-        loadView('apps', 'Apps');
+    // Obtener el nombre de la aplicación por su ID
+    getAppNameById(id) {
+        const app = window.apps.find(app => app.id === id);
+        return app ? app.name : 'Unknown';
     }
 }
-
