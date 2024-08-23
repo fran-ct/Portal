@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const encryptionKey = 'my-global-secret-key';
     window.appManager = new AppManager(encryptionKey);
 
-    // Inicializa la aplicación
     appManager.initializeApp();
 
     // Cargar la vista inicial

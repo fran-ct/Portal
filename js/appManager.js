@@ -27,6 +27,9 @@ class AppManager {
     loadView(viewName, viewTitle) {
         const contentDiv = document.getElementById('content');
         contentDiv.style.opacity = 0; // Inicia la transición
+        
+        // Eliminar el CSS y JS anteriores
+        this.removePreviousAssets();
 
         setTimeout(() => {
             fetch(`views/${viewName}/${viewName}.html`)
@@ -35,9 +38,18 @@ class AppManager {
                     contentDiv.innerHTML = html;
                     contentDiv.style.opacity = 1; // Termina la transición
 
+                    // Cargar el CSS específico de la vista
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = `views/${viewName}/${viewName}.css`;
+                    link.setAttribute('data-view-style', '');
+                    document.head.appendChild(link);
+
+                    // Cargar el JS específico de la vista
                     const script = document.createElement('script');
                     script.src = `views/${viewName}/${viewName}.js`;
                     script.defer = true;
+                    script.setAttribute('data-view-script', '');
                     script.onload = () => {
                         if (typeof initializeView === 'function') {
                             initializeView();
@@ -48,8 +60,22 @@ class AppManager {
                     document.title = viewTitle;
                 })
                 .catch(error => console.error('Error al cargar la vista:', error));
-        }, 300); // Tiempo de la transición
+        }, 100); // Tiempo de la transición
     }
+
+
+    removePreviousAssets() {
+        // Eliminar el CSS anterior
+        const oldLink = document.querySelector('link[data-view-style]');
+        if (oldLink) {
+            oldLink.remove();
+        }
+
+        // Eliminar los scripts anteriores
+        const oldScripts = document.querySelectorAll('script[data-view-script]');
+        oldScripts.forEach(script => script.remove());
+    }
+
 
     // Limpiar todos los datos
     clearAllData() {
@@ -74,3 +100,5 @@ class AppManager {
         return app ? app.name : 'Unknown';
     }
 }
+
+
