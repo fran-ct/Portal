@@ -1,9 +1,16 @@
+let issues = [];
+let selectedIssue = null;
+let selectedEvent = null;
+
 function initializeView() {
 
+    // Verificar si el usuario está autenticado
+    if (!appManager.sessionManager.isSessionActive()) {
+        alert('You must be logged in to use the Worklog Manager.');
+        appManager.loadView('signin', 'Sign In');
+        return;
+    }
 
-}
-
-document.addEventListener('DOMContentLoaded', function () {
     // Cargar los calendarios disponibles y los eventos del día
     loadAvailableCalendars();
     filterEvents();
@@ -13,71 +20,80 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('date-input').addEventListener('change', filterEvents);
     document.getElementById('updateEvents-btn').addEventListener('click', filterEvents);
 
-    // Cargar los issues de Jira desde el backend
-    loadIssuesFromBackend();
+    // Cargar los issues de Jira desde Google Sheets
+    loadIssuesFromSpreadsheet();
 
     // Configurar los filtros de issues
     document.getElementById('squadId').addEventListener('change', filterIssues);
     document.getElementById('project').addEventListener('change', filterIssues);
     document.getElementById('assignee').addEventListener('change', filterIssues);
     document.getElementById('searchIssue').addEventListener('input', filterIssues);
-});
 
-function loadAvailableCalendars() {
-    fetch(BACKEND_URL + '/api/getAvailableCalendars', {
-        method: 'POST',
-        credentials: "omit",
-        redirect: "follow",
-        headers: {
-            'Content-Type': 'text/plain'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                populateCalendars(data.data.calendars);
-                document.getElementById('calendar-select').value = data.data.defaultCalendar.id;
-            } else {
-                showError('Error loading calendars.');
-            }
-        })
-        .catch(error => {
-            showError('Error communicating with the backend while loading calendars.');
-        });
+    // Configurar el botón de sincronización
+    document.getElementById('syncButton').addEventListener('click', syncWorklog);
 }
 
+// Cargar calendarios desde Google Calendar
+function loadAvailableCalendars() {
+    const accessToken = appManager.unencryptedDB.get('access_token');
+    fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.items) {
+            populateCalendars(data.items);
+            document.getElementById('calendar-select').value = data.items[0].id; // Seleccionar el primer calendario por defecto
+        } else {
+            showError('Error loading calendars.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Calendar API.');
+    });
+}
+
+// Llenar el select de calendarios
 function populateCalendars(calendars) {
     const calendarSelect = document.getElementById('calendar-select');
     calendarSelect.innerHTML = '';
     calendars.forEach(calendar => {
         const option = document.createElement('option');
         option.value = calendar.id;
-        option.textContent = calendar.nombre;
+        option.textContent = calendar.summary;
         calendarSelect.appendChild(option);
     });
 }
 
+// Filtrar y mostrar eventos desde Google Calendar
 function filterEvents() {
     const date = document.getElementById('date-input').value;
     const calendarId = document.getElementById('calendar-select').value;
+    const accessToken = appManager.unencryptedDB.get('access_token');
 
-    fetch(`${BACKEND_URL}/api/getEvents?${params.toString()}`, {
-        method: 'GET', // Cambiado a GET
-        redirect: 'follow'
+    fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${new Date(date).toISOString()}&timeMax=${new Date(date + 'T23:59:59Z').toISOString()}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateEventsList(data.events);
-            } else {
-                showError('Error loading events.');
-            }
-        })
-        .catch(error => {
-            showError('Error communicating with the backend while loading events.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.items) {
+            updateEventsList(data.items);
+        } else {
+            showError('Error loading events.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Calendar API.');
+    });
 }
 
+// Actualizar la lista de eventos en la UI
 function updateEventsList(events) {
     const list = document.querySelector("#eventsTable tbody");
     list.innerHTML = '';
@@ -87,13 +103,15 @@ function updateEventsList(events) {
         row.id = event.id;
 
         const startTimeCol = document.createElement('td');
-        startTimeCol.textContent = moment(event.startTime).format("HH:mm");
+        startTimeCol.textContent = moment(event.start.dateTime).format("HH:mm");
 
         const titleCol = document.createElement('td');
-        titleCol.textContent = event.title;
+        titleCol.textContent = event.summary;
 
         const durationCol = document.createElement('td');
-        durationCol.textContent = moment.duration(moment(event.endTime).diff(moment(event.startTime))).humanize();
+        const start = moment(event.start.dateTime);
+        const end = moment(event.end.dateTime);
+        durationCol.textContent = moment.duration(end.diff(start)).humanize();
 
         row.appendChild(startTimeCol);
         row.appendChild(titleCol);
@@ -109,39 +127,53 @@ function updateEventsList(events) {
     });
 }
 
+// Seleccionar un evento
 function selectEvent(eventId) {
     const event = events.find(e => e.id === eventId);
     if (event) {
-        document.getElementById('selectedEventComment').value = event.title;
+        selectedEvent = event;
+        document.getElementById('selectedEventComment').value = event.summary;
         document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
         document.getElementById(eventId).classList.add('selected');
     }
 }
 
-function loadIssuesFromBackend() {
-    fetch(BACKEND_URL + '/api/getJiraIssues', {
-        method: 'POST',
-        credentials: "omit",
-        redirect: "follow",
+// Cargar issues desde Google Sheets
+function loadIssuesFromSpreadsheet() {
+    const spreadsheetId = 'YOUR_SPREADSHEET_ID';
+    const range = 'Sheet1!A:G'; // Ajusta el rango según tu hoja de cálculo
+    const accessToken = appManager.unencryptedDB.get('access_token');
+
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`, {
+        method: 'GET',
         headers: {
-            'Content-Type': 'text/plain'
+            'Authorization': `Bearer ${accessToken}`
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                issues = data.issues;
-                populateIssueFilters(issues);
-                updateIssuesTable(issues);
-            } else {
-                showError('Error loading issues.');
-            }
-        })
-        .catch(error => {
-            showError('Error communicating with the backend while loading issues.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.values) {
+            issues = data.values.map(row => ({
+                id: row[0],
+                summary: row[1],
+                squadId: row[2],
+                project: row[3],
+                assigneeName: row[4],
+                status: row[5],
+                timespent: row[6]
+            }));
+            populateIssueFilters(issues);
+            updateIssuesTable(issues);
+        } else {
+            showError('Error loading issues from spreadsheet.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Sheets API.');
+    });
 }
 
+// Llenar los selectores de filtros de issues
 function populateIssueFilters(issues) {
     const squads = removeDups(issues.map(issue => issue.squadId));
     populateSelectOptions('squadId', squads);
@@ -153,6 +185,7 @@ function populateIssueFilters(issues) {
     populateSelectOptions('assignee', assignees);
 }
 
+// Llenar un select con opciones
 function populateSelectOptions(elementId, options) {
     const select = document.getElementById(elementId);
     select.innerHTML = '<option value="Select">Select</option>';
@@ -164,6 +197,7 @@ function populateSelectOptions(elementId, options) {
     });
 }
 
+// Filtrar issues en la tabla
 function filterIssues() {
     const squadId = document.getElementById('squadId').value;
     const project = document.getElementById('project').value;
@@ -188,6 +222,7 @@ function filterIssues() {
     updateIssuesTable(filteredIssues);
 }
 
+// Actualizar la tabla de issues en la UI
 function updateIssuesTable(filteredIssues) {
     const tableBody = document.querySelector("#issuesTable tbody");
     tableBody.innerHTML = '';
@@ -205,7 +240,7 @@ function updateIssuesTable(filteredIssues) {
 
         const linkCol = document.createElement('td');
         const link = document.createElement('a');
-        link.href = `https://craftech.atlassian.net/browse/${issue.key}`;
+        link.href = `https://your-jira-domain.atlassian.net/browse/${issue.key}`;
         link.target = '_blank';
         link.textContent = issue.key;
         linkCol.appendChild(link);
@@ -229,6 +264,7 @@ function updateIssuesTable(filteredIssues) {
     });
 }
 
+// Seleccionar un issue
 function selectIssue(issueId) {
     const issue = issues.find(i => i.id === issueId);
     if (issue) {
@@ -239,54 +275,62 @@ function selectIssue(issueId) {
     }
 }
 
+// Sincronizar worklog a Jira
+function syncWorklog() {
+    if (!selectedIssue || !selectedEvent) {
+        showError('Please select both an issue and an event to sync.');
+        return;
+    }
+
+    const comment = document.getElementById('selectedEventComment').value;
+    const duration = moment.duration(moment(selectedEvent.end.dateTime).diff(moment(selectedEvent.start.dateTime))).asSeconds();
+    const jiraToken = appManager.encryptedDB.get('jira_token');
+
+    fetch(`https://your-jira-domain.atlassian.net/rest/api/2/issue/${selectedIssue.key}/worklog`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${btoa('your-email:' + jiraToken)}`, // Asumiendo que usas Basic Auth
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            timeSpentSeconds: duration,
+            comment: comment,
+            started: moment(selectedEvent.start.dateTime).toISOString()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
+            document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
+            document.getElementById('selectedEventComment').value = '';
+            showSuccess('Worklog uploaded successfully.');
+        } else {
+            showError('Error uploading worklog: ' + data.message);
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Jira API.');
+    });
+}
+
+// Mostrar errores
+function showError(message) {
+    console.error(message);
+    // Puedes implementar un sistema de notificación visual aquí si lo deseas.
+}
+
+// Mostrar éxito
+function showSuccess(message) {
+    console.log(message);
+    // Implementar notificación visual de éxito si es necesario
+}
+
+// Eliminar duplicados de una lista
 function removeDups(list) {
     let unique = {};
     list.forEach(function (i) {
         unique[i] = true;
     });
     return Object.keys(unique);
-}
-
-function showError(message) {
-    console.error(message);
-    // Puedes implementar un sistema de notificación visual aquí si lo deseas.
-}
-
-document.getElementById('syncButton').addEventListener('click', function () {
-    const comment = document.getElementById('selectedEventComment').value;
-    const duration = moment.duration(moment(selectedEvent.endTime).diff(moment(selectedEvent.startTime))).asSeconds();
-
-    fetch(BACKEND_URL + '/api/setIssueWorklog', {
-        method: 'POST',
-        credentials: "omit",
-        redirect: "follow",
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify({
-            issueKey: selectedIssue.key,
-            timeSpentSeconds: duration,
-            comment: comment,
-            started: moment(selectedEvent.startTime).toISOString().replace("Z", "-0000")
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-                document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
-                document.getElementById('selectedEventComment').value = '';
-                showSuccess('Worklog uploaded successfully.');
-            } else {
-                showError('Error uploading worklog: ' + data.message);
-            }
-        })
-        .catch(error => {
-            showError('Error communicating with the backend while uploading worklog.');
-        });
-});
-
-function showSuccess(message) {
-    console.log(message);
-    // Implementar notificación visual de éxito si es necesario
 }
