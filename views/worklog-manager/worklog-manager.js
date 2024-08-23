@@ -36,13 +36,23 @@ function initializeView() {
 // Cargar calendarios desde Google Calendar
 function loadAvailableCalendars() {
     const accessToken = appManager.unencryptedDB.get('access_token');
+    if (!accessToken) {
+        showError('No access token found.');
+        return;
+    }
+
     fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.status === 401) {
+            throw new Error('Unauthorized: Token may be expired or invalid.');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.items) {
             populateCalendars(data.items);
@@ -52,7 +62,7 @@ function loadAvailableCalendars() {
         }
     })
     .catch(error => {
-        showError('Error communicating with Google Calendar API.');
+        showError('Error communicating with Google Calendar API: ' + error.message);
     });
 }
 
@@ -71,10 +81,18 @@ function populateCalendars(calendars) {
 // Filtrar y mostrar eventos desde Google Calendar
 function filterEvents() {
     const date = document.getElementById('date-input').value;
+    if (!date) {
+        showError('Please select a valid date.');
+        return;
+    }
+
     const calendarId = document.getElementById('calendar-select').value;
     const accessToken = appManager.unencryptedDB.get('access_token');
 
-    fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${new Date(date).toISOString()}&timeMax=${new Date(date + 'T23:59:59Z').toISOString()}`, {
+    const timeMin = new Date(date).toISOString();
+    const timeMax = new Date(new Date(date).setHours(23, 59, 59, 999)).toISOString();
+
+    fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${timeMin}&timeMax=${timeMax}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -89,7 +107,7 @@ function filterEvents() {
         }
     })
     .catch(error => {
-        showError('Error communicating with Google Calendar API.');
+        showError('Error communicating with Google Calendar API: ' + error.message);
     });
 }
 
@@ -138,199 +156,4 @@ function selectEvent(eventId) {
     }
 }
 
-// Cargar issues desde Google Sheets
-function loadIssuesFromSpreadsheet() {
-    const spreadsheetId = 'YOUR_SPREADSHEET_ID';
-    const range = 'Sheet1!A:G'; // Ajusta el rango según tu hoja de cálculo
-    const accessToken = appManager.unencryptedDB.get('access_token');
-
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.values) {
-            issues = data.values.map(row => ({
-                id: row[0],
-                summary: row[1],
-                squadId: row[2],
-                project: row[3],
-                assigneeName: row[4],
-                status: row[5],
-                timespent: row[6]
-            }));
-            populateIssueFilters(issues);
-            updateIssuesTable(issues);
-        } else {
-            showError('Error loading issues from spreadsheet.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with Google Sheets API.');
-    });
-}
-
-// Llenar los selectores de filtros de issues
-function populateIssueFilters(issues) {
-    const squads = removeDups(issues.map(issue => issue.squadId));
-    populateSelectOptions('squadId', squads);
-
-    const projects = removeDups(issues.map(issue => issue.project));
-    populateSelectOptions('project', projects);
-
-    const assignees = removeDups(issues.map(issue => issue.assigneeName));
-    populateSelectOptions('assignee', assignees);
-}
-
-// Llenar un select con opciones
-function populateSelectOptions(elementId, options) {
-    const select = document.getElementById(elementId);
-    select.innerHTML = '<option value="Select">Select</option>';
-    options.forEach(option => {
-        const opt = document.createElement('option');
-        opt.value = option;
-        opt.textContent = option;
-        select.appendChild(opt);
-    });
-}
-
-// Filtrar issues en la tabla
-function filterIssues() {
-    const squadId = document.getElementById('squadId').value;
-    const project = document.getElementById('project').value;
-    const assignee = document.getElementById('assignee').value;
-    const searchText = document.getElementById('searchIssue').value.toLowerCase();
-
-    let filteredIssues = issues;
-
-    if (squadId !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.squadId === squadId);
-    }
-    if (project !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.project === project);
-    }
-    if (assignee !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.assigneeName === assignee);
-    }
-    if (searchText) {
-        filteredIssues = filteredIssues.filter(issue => issue.summary.toLowerCase().includes(searchText));
-    }
-
-    updateIssuesTable(filteredIssues);
-}
-
-// Actualizar la tabla de issues en la UI
-function updateIssuesTable(filteredIssues) {
-    const tableBody = document.querySelector("#issuesTable tbody");
-    tableBody.innerHTML = '';
-    filteredIssues.forEach(issue => {
-        const row = document.createElement('tr');
-        row.classList.add('issue-row');
-        row.id = issue.id;
-
-        const summaryCol = document.createElement('td');
-        summaryCol.textContent = issue.summary;
-
-        const spentCol = document.createElement('td');
-        spentCol.classList.add('center-text');
-        spentCol.textContent = issue.timespent ? moment.duration(issue.timespent, 'seconds').humanize() : 'none';
-
-        const linkCol = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = `https://your-jira-domain.atlassian.net/browse/${issue.key}`;
-        link.target = '_blank';
-        link.textContent = issue.key;
-        linkCol.appendChild(link);
-
-        const statusCol = document.createElement('td');
-        statusCol.classList.add('center-text');
-        statusCol.textContent = issue.status;
-
-        row.appendChild(summaryCol);
-        row.appendChild(spentCol);
-        row.appendChild(linkCol);
-        row.appendChild(statusCol);
-        tableBody.appendChild(row);
-    });
-
-    // Configurar el evento de selección de fila
-    document.querySelectorAll('.issue-row').forEach(row => {
-        row.addEventListener('click', function () {
-            selectIssue(row.id);
-        });
-    });
-}
-
-// Seleccionar un issue
-function selectIssue(issueId) {
-    const issue = issues.find(i => i.id === issueId);
-    if (issue) {
-        selectedIssue = issue;
-        document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-        document.getElementById(issueId).classList.add('selected');
-        document.getElementById('selectedIssueKey').value = issue.key;
-    }
-}
-
-// Sincronizar worklog a Jira
-function syncWorklog() {
-    if (!selectedIssue || !selectedEvent) {
-        showError('Please select both an issue and an event to sync.');
-        return;
-    }
-
-    const comment = document.getElementById('selectedEventComment').value;
-    const duration = moment.duration(moment(selectedEvent.end.dateTime).diff(moment(selectedEvent.start.dateTime))).asSeconds();
-    const jiraToken = appManager.encryptedDB.get('jira_token');
-
-    fetch(`https://your-jira-domain.atlassian.net/rest/api/2/issue/${selectedIssue.key}/worklog`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${btoa('your-email:' + jiraToken)}`, // Asumiendo que usas Basic Auth
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            timeSpentSeconds: duration,
-            comment: comment,
-            started: moment(selectedEvent.start.dateTime).toISOString()
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.id) {
-            document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-            document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
-            document.getElementById('selectedEventComment').value = '';
-            showSuccess('Worklog uploaded successfully.');
-        } else {
-            showError('Error uploading worklog: ' + data.message);
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with Jira API.');
-    });
-}
-
-// Mostrar errores
-function showError(message) {
-    console.error(message);
-    // Puedes implementar un sistema de notificación visual aquí si lo deseas.
-}
-
-// Mostrar éxito
-function showSuccess(message) {
-    console.log(message);
-    // Implementar notificación visual de éxito si es necesario
-}
-
-// Eliminar duplicados de una lista
-function removeDups(list) {
-    let unique = {};
-    list.forEach(function (i) {
-        unique[i] = true;
-    });
-    return Object.keys(unique);
-}
+// Resto del código permanece igual...

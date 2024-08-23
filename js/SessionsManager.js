@@ -8,7 +8,7 @@ class SessionManager {
         google.accounts.id.initialize({
             client_id: CLIENT_ID,
             callback: this.handleCredentialResponse.bind(this),
-            scope: "https://www.googleapis.com/auth/calendar"
+            scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets'
         });
         this.promptGoogleSignIn();
     }
