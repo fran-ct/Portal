@@ -10,7 +10,13 @@ class SessionManager {
         google.accounts.id.initialize({
             client_id: CLIENT_ID,
             callback: this.handleCredentialResponse.bind(this),
-            scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets'
+            scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
+            auto_select: true,
+            ux_mode: "popup",
+            context: "signin",
+            cancel_on_tap_outside: true,
+            prompt_parent_id: "signInButtonContainer",
+            auto_prompt: false
         });
         this.promptGoogleSignIn();
     }
