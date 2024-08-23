@@ -10,32 +10,14 @@ class SessionManager {
             client_id: CLIENT_ID,
             callback: this.handleCredentialResponse.bind(this),
             scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
+            auto_select: true,
             ux_mode: "popup",
+            context: "signin",
+            cancel_on_tap_outside: true,
+            prompt_parent_id: "signInButtonContainer",
             auto_prompt: false
         });
-
-        this.checkSessionStatus()
-            .then((isActive) => {
-                if (!isActive) {
-                    this.promptGoogleSignIn();
-                } else {
-                    this.updateUIWithUserProfile();
-                }
-            })
-            .catch((error) => {
-                console.error("Error during session check: ", error);
-                this.promptGoogleSignIn();
-            });
-    }
-
-    // Verifica el estado de la sesión
-    async checkSessionStatus() {
-        const googleAccessToken = this.appManager.unencryptedDB.get('google_access_token');
-        if (googleAccessToken) {
-            const isValid = await this.validateAccessToken(googleAccessToken);
-            return isValid;
-        }
-        return false;
+        this.promptGoogleSignIn();
     }
 
     // Solicita el inicio de sesión si no hay una sesión activa
@@ -43,7 +25,11 @@ class SessionManager {
         if (this.authAttempted) return; // Evitar múltiples intentos
         this.authAttempted = true; // Marcar como que ya se intentó la autenticación
 
-        google.accounts.id.prompt();
+        if (!this.isSessionActive()) {
+            google.accounts.id.prompt();
+        } else {
+            this.updateUIWithUserProfile();
+        }
     }
 
     // Maneja la respuesta de credenciales de Google
@@ -59,9 +45,13 @@ class SessionManager {
         if (this.validateIdToken(idToken)) {
             this.fetchAccessToken(idToken)
                 .then(accessToken => {
-                    this.appManager.unencryptedDB.set('google_access_token', accessToken);
-                    this.updateUIWithUserProfile(profile);
-                    this.appManager.loadInitialView();
+                    if (accessToken) {
+                        this.appManager.unencryptedDB.set('google_access_token', accessToken);
+                        this.updateUIWithUserProfile(profile);
+                        this.appManager.loadInitialView();
+                    } else {
+                        throw new Error("Access token is null or undefined.");
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching access token:', error);
@@ -81,18 +71,20 @@ class SessionManager {
             throw new Error('Failed to fetch access token');
         }
         const data = await response.json();
-        return data.access_token; // Aquí ya tendrás el Access Token
+        return data.access_token || null; // Aquí ya tendrás el Access Token
     }
 
     // Validación del ID Token
     validateIdToken(idToken) {
         const parsedToken = this.appManager.unencryptedDB.parseJwt(idToken);
         const currentTime = Math.floor(Date.now() / 1000);
-        return parsedToken.exp > currentTime;
+        return parsedToken && parsedToken.exp > currentTime;
     }
 
     // Validación del Access Token
     async validateAccessToken(accessToken) {
+        if (!accessToken) return false;
+
         try {
             const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
             const data = await response.json();
@@ -104,9 +96,9 @@ class SessionManager {
     }
 
     // Verifica si la sesión está activa
-    isSessionActive() {
+    async isSessionActive() {
         const googleAccessToken = this.appManager.unencryptedDB.get('google_access_token');
-        return googleAccessToken && this.validateAccessToken(googleAccessToken);
+        return googleAccessToken && await this.validateAccessToken(googleAccessToken);
     }
 
     // Actualiza la interfaz con la información del perfil del usuario
@@ -131,10 +123,8 @@ class SessionManager {
         const confirmation = confirm("Are you sure you want to log out? All stored data will be erased.");
 
         if (confirmation) {
-            this.appManager.clearAllData();
-
+            // this.appManager.clearAllData();
             this.appManager.loadView('signin', 'Sign In');
-
             this.promptGoogleSignIn();
         }
     }

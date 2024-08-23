@@ -1,4 +1,6 @@
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
+
+
 class StorageDB {
     constructor(encryptionKey = null) {
         this.encryptionKey = encryptionKey;
@@ -26,6 +28,7 @@ class StorageDB {
             return JSON.parse(data);
         } catch (e) {
             console.error(`Error parsing data for key ${key}:`, e);
+            this.remove(key); // Remover el valor corrupto del almacenamiento
             return null; // Devolver null si ocurre un error al parsear
         }
     }
