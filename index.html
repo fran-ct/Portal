@@ -17,14 +17,14 @@
                 <img src="images/craftech_logo.png" alt="Crafto Logo">
             </div>
             <div id="menu">
-                <div id="apps" class="headerItem">
+                <div id="apps" class="headerItem" onclick="window.location.hash = 'apps';">
                     <img src="images/menu_toolbar.svg" alt="Apps Menu">
                 </div>
                 <div id="settings" class="headerItem" style="display: none;">
-                    <img src="images/gear_toolbar.svg" alt="Settings" onclick="appManager.loadView('settings', 'Settings'); history.pushState(null, '', '#settings');">
+                    <img src="images/gear_toolbar.svg" alt="Settings">
                 </div>
                 <div id="help" class="headerItem" style="display: none;">
-                    <img src="images/help_toolbar.svg" alt="Help" onclick="appManager.loadView('help', 'Help'); history.pushState(null, '', '#help');">
+                    <img src="images/help_toolbar.svg" alt="Help">
                 </div>
             </div>
             <div id="user-info" >
