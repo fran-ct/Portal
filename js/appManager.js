@@ -1,3 +1,5 @@
+console.log("Ver: 1.1")
+
 class AppManager {
     constructor(encryptionKey) {
         this.encryptionKey = encryptionKey;
