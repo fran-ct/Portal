@@ -1,4 +1,4 @@
-console.log("Ver: 1.2")
+console.log("Ver: 1.3")
 
 class AppManager {
     constructor(encryptionKey) {

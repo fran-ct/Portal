@@ -49,6 +49,11 @@ class SessionManager {
         document.getElementById('user-image').src = profile.picture;
         document.getElementById('user-image').style.filter = 'none';
         document.getElementById('user-image').alt = profile.email;
+        document.getElementById('user-image').style.display = "block";
+        document.getElementById('user-name').style.display = "block";
+        document.getElementById('user-apps').style.display = "block";
+        document.getElementById('user-help').style.display = "block";
+        document.getElementById('user-settings').style.display = "block";
     }
 
     // Maneja la desconexión de la sesión
