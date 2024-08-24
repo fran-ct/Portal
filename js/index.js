@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const encryptionKey = 'my-global-secret-key';
     window.appManager = new AppManager(encryptionKey);
-    window.sessionManager = new SessionManager(appManager);
-
-    await sessionManager.initialize();
+    window.sessionManager = appManager.sessionManager;
 
     if (!await sessionManager.isSessionActive()) {
         sessionManager.login();
     } else {
         appManager.loadInitialView();
     }
+    
 
     // Precargar vistas más utilizadas
     appManager.preLoadViews(['apps', 'signin', 'settings']);
