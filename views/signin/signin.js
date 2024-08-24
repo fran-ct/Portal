@@ -1,9 +1,9 @@
 function initializeView() {
-    const googleIdToken = appManager.unencryptedDB.get('google_id_token');
-    const googleAccessToken = appManager.unencryptedDB.get('google_access_token');
+    const googleIdToken = sessionManager.getIdToken();
+    const googleAccessToken = sessionManager.getAccessToken();
 
     if (googleIdToken && appManager.unencryptedDB.isGtokenValid(googleIdToken) &&
-        googleAccessToken && appManager.sessionManager.validateAccessToken(googleAccessToken)) {
+        googleAccessToken && sessionManager.validateAccessToken(googleAccessToken)) {
 
         const profile = appManager.unencryptedDB.get('user_profile');
 
@@ -24,7 +24,6 @@ function initializeView() {
             { theme: "outline", size: "large", text: "signin", shape: "pill" }
         );
 
-        // Opcional: puedes solicitar el inicio de sesión automático si es necesario
-        google.accounts.id.prompt(); // Solo si deseas solicitar automáticamente el inicio de sesión
+        google.accounts.id.prompt(); // Opcional: solicitar inicio de sesión automático
     }
 }

@@ -46,7 +46,7 @@ function initializeView() {
 
     // Cerrar sesión
     logoutBtn.addEventListener('click', () => {
-       appManager.sessionManager.logout();
+        sessionManager.logout();
     });
 
     // Limpiar todos los datos locales

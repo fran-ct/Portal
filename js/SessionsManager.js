@@ -8,7 +8,6 @@ class SessionManager {
         google.accounts.id.initialize({
             client_id: CLIENT_ID,
             callback: this.handleCredentialResponse.bind(this),
-            scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
             auto_select: false,
             ux_mode: "popup",
             context: "signin",
@@ -32,7 +31,13 @@ class SessionManager {
     async handleCredentialResponse(response) {
         try {
             const idToken = response.credential;
-            await this.validateAndStoreTokens(idToken);
+            this.storeIdToken(idToken);
+
+            const accessToken = await this.fetchAccessToken(idToken);
+            if (accessToken) {
+                this.storeAccessToken(accessToken);
+            }
+
             this.updateUIWithUserProfile();
             this.appManager.loadInitialView();
         } catch (error) {
@@ -41,21 +46,11 @@ class SessionManager {
         }
     }
 
-    async validateAndStoreTokens(idToken) {
-        if (this.validateIdToken(idToken)) {
-            const accessToken = await this.fetchAccessToken(idToken);
-            if (accessToken) {
-                this.storeTokens(idToken, accessToken);
-            } else {
-                throw new Error("Failed to fetch access token");
-            }
-        } else {
-            throw new Error("Invalid ID token");
-        }
+    storeIdToken(idToken) {
+        this.appManager.encryptedDB.set('google_id_token', idToken);
     }
 
-    storeTokens(idToken, accessToken) {
-        this.appManager.encryptedDB.set('google_id_token', idToken);
+    storeAccessToken(accessToken) {
         this.appManager.encryptedDB.set('google_access_token', accessToken);
         const expirationTime = Date.now() + 3600000; // Current time + 1 hour in milliseconds
         this.appManager.encryptedDB.set('token_expiration', expirationTime.toString());
@@ -73,12 +68,6 @@ class SessionManager {
             console.error('Error fetching access token:', error);
             return null;
         }
-    }
-
-    validateIdToken(idToken) {
-        const parsedToken = this.appManager.encryptedDB.parseJwt(idToken);
-        const currentTime = Math.floor(Date.now() / 1000);
-        return parsedToken && parsedToken.exp > currentTime;
     }
 
     async isSessionActive() {
@@ -109,12 +98,8 @@ class SessionManager {
         return null;
     }
 
-    logout() {
-        const confirmation = confirm("Are you sure you want to log out? You will need to re-authenticate.");
-        if (confirmation) {
-            this.clearTokens();
-            this.appManager.loadView('signin', 'Sign In');
-        }
+    getIdToken() {
+        return this.appManager.encryptedDB.get('google_id_token');
     }
 
     clearTokens() {
@@ -123,8 +108,16 @@ class SessionManager {
         this.appManager.encryptedDB.remove('token_expiration');
     }
 
+    logout() {
+        const confirmation = confirm("Are you sure you want to log out? You will need to re-authenticate.");
+        if (confirmation) {
+            this.clearTokens();
+            this.appManager.loadView('signin', 'Sign In');
+        }
+    }
+
     updateUIWithUserProfile() {
-        const idToken = this.appManager.encryptedDB.get('google_id_token');
+        const idToken = this.getIdToken();
         if (idToken) {
             const profile = this.appManager.encryptedDB.parseJwt(idToken);
             if (profile) {

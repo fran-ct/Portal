@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const encryptionKey = 'my-global-secret-key';
     window.appManager = new AppManager(encryptionKey);
+    window.sessionManager = new SessionManager(appManager);
 
     await appManager.initializeApp();
 
