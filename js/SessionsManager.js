@@ -19,8 +19,14 @@ class SessionManager {
         if (await this.isSessionActive()) {
             console.log("Session is active");
         } else {
-            this.promptGoogleSignIn();
+            this.promptGoogleSignIn(); // Asegurarse de que el método esté definido
         }
+    }
+
+    promptGoogleSignIn() {
+        if (this.authAttempted) return;
+        this.authAttempted = true;
+        google.accounts.id.prompt();
     }
 
     async handleCredentialResponse(response) {
