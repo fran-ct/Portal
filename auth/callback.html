@@ -16,7 +16,7 @@
             };
 
             const userManager = new Oidc.UserManager(oidcSettings);
-
+            console.log(userManager)
             userManager.signinRedirectCallback().then(function() {
                 console.log("Authentication successful");
                 window.location.href = "/Portal";  // Redirect after successful authentication
