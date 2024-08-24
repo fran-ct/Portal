@@ -18,8 +18,6 @@ class SessionManager {
 
         this.userManager = new Oidc.UserManager(oidcSettings);
 
-        Oidc.Log.logger = console;
-        Oidc.Log.level = Oidc.Log.DEBUG;
 
     }
 
