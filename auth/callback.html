@@ -10,7 +10,8 @@
             window.location.href = "/Portal";  // Redirige a la página principal después de autenticarse
         }).catch(function(err) {
             console.error("Error during callback processing:", err);
-            alert("Error during callback processing");
+    console.log("State expected vs received:", err.state);
+    alert("Error during callback processing. Check console for details.");
         });
     </script>
 </head>
