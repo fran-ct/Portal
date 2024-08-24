@@ -2,19 +2,18 @@ class SessionManager {
     constructor(appManager) {
         this.appManager = appManager;
 
-        const redirectUri = window.location.origin + "/auth/callback.html";
-        console.log("Redirect URI:", redirectUri);
+        const winLocationOrigin = window.location.origin + "/Portal";
 
         const oidcSettings = {
             authority: "https://accounts.google.com",
             client_id: CLIENT_ID,
-            redirect_uri: redirectUri,  // Usa la URI que hemos logueado
+            redirect_uri: winLocationOrigin + "/auth/callback.html",  // Usa la URI que hemos logueado
             response_type: "code",  // Usar Authorization Code Flow para obtener access_token
             scope: "openid profile email",  // Scopes que deseas solicitar
             loadUserInfo: true,
-            post_logout_redirect_uri: window.location.origin,
+            post_logout_redirect_uri: winLocationOrigin,
             automaticSilentRenew: true,
-            silent_redirect_uri: window.location.origin + "/auth/silent-renew.html"
+            silent_redirect_uri: winLocationOrigin + "/auth/silent-renew.html"
         };
 
         this.userManager = new Oidc.UserManager(oidcSettings);
