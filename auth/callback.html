@@ -7,13 +7,19 @@
     <script src="https://cdn.jsdelivr.net/npm/oidc-client@1.11.5/dist/oidc-client.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Session Storage:', sessionStorage);  // Verifies state is present
+            console.log('Local Storage:', localStorage);
+
             const oidcSettings = {
-                userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage })  // Fuerza el uso de sessionStorage en callback
+                response_mode: "query",  // Explicitly set response_mode to "query"
+                userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage })  // Use sessionStorage
             };
+
             const userManager = new Oidc.UserManager(oidcSettings);
+
             userManager.signinRedirectCallback().then(function() {
                 console.log("Authentication successful");
-                window.location.href = "/Portal";
+                window.location.href = "/Portal";  // Redirect after successful authentication
             }).catch(function(err) {
                 console.error("Error during callback processing:", err);
                 console.log("State expected vs received:", err.state);
