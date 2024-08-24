@@ -9,7 +9,7 @@
         console.log('Session Storage:', sessionStorage);
         console.log('Local Storage:', localStorage);
         new Oidc.UserManager().signinRedirectCallback().then(function() {
-            window.location.href = "/Portal/index.html";  // Redirige a la página principal después de autenticarse
+            window.location.href = "/Portal";  // Redirige a la página principal después de autenticarse
         }).catch(function(err) {
             console.error("Error during callback processing:", err);
     console.log("State expected vs received:", err.state);
