@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.10.1/oidc-client.min.js"></script>
+</head>
+<body>
+    <script>
+        const oidcSettings = {
+            authority: "https://accounts.google.com",
+            client_id: "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com",
+            redirect_uri: window.location.origin + "/auth/callback.html",
+            response_type: "code",
+            scope: "openid profile email",
+            loadUserInfo: true,
+            post_logout_redirect_uri: window.location.origin,
+            automaticSilentRenew: true,
+            silent_redirect_uri: window.location.origin + "/auth/silent-renew.html"
+        };
+
+        const userManager = new Oidc.UserManager(oidcSettings);
+
+        userManager.signinRedirectCallback().then(user => {
+            console.log("User logged in", user);
+            window.location.href = "/";
+        }).catch(error => {
+            console.error("Error during callback processing", error);
+        });
+    </script>
+</body>
+</html>

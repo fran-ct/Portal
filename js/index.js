@@ -3,7 +3,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.appManager = new AppManager(encryptionKey);
     window.sessionManager = new SessionManager(appManager);
 
-    await appManager.initializeApp();
+    await sessionManager.initialize();
+
+    if (!await sessionManager.isSessionActive()) {
+        sessionManager.login();
+    } else {
+        appManager.loadInitialView();
+    }
 
     // Precargar vistas más utilizadas
     appManager.preLoadViews(['apps', 'signin', 'settings']);
