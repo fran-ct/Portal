@@ -2,6 +2,7 @@ class SessionManager {
     constructor(appManager) {
         this.appManager = appManager;
         this.authAttempted = false;
+        this.codeVerifier = null;
     }
 
     initialize() {
@@ -22,24 +23,18 @@ class SessionManager {
         }
     }
 
-    promptGoogleSignIn() {
-        if (this.authAttempted) return;
-        this.authAttempted = true;
-        google.accounts.id.prompt();
-    }
-
     async handleCredentialResponse(response) {
         try {
             const idToken = response.credential;
             this.storeIdToken(idToken);
 
-            const accessToken = await this.fetchAccessToken(idToken);
-            if (accessToken) {
-                this.storeAccessToken(accessToken);
-            }
+            // Generar el code verifier para PKCE
+            this.codeVerifier = this.generateCodeVerifier();
+            const codeChallenge = await this.generateCodeChallenge(this.codeVerifier);
 
-            this.updateUIWithUserProfile();
-            this.appManager.loadInitialView();
+            // Redirigir al usuario para obtener el authorization code
+            this.redirectToAuthEndpoint(codeChallenge);
+
         } catch (error) {
             console.error('Error handling credential response:', error);
             alert('Failed to authenticate. Please try again.');
@@ -56,12 +51,21 @@ class SessionManager {
         this.appManager.encryptedDB.set('token_expiration', expirationTime.toString());
     }
 
-    async fetchAccessToken(idToken) {
+    async fetchAccessToken(authorizationCode) {
         try {
-            const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch access token');
-            }
+            const response = await fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    client_id: CLIENT_ID,
+                    code: authorizationCode,
+                    redirect_uri: window.location.origin, // Asegúrate de que esta sea la misma URI registrada en la consola de Google
+                    grant_type: 'authorization_code',
+                    code_verifier: this.codeVerifier
+                })
+            });
             const data = await response.json();
             return data.access_token || null;
         } catch (error) {
@@ -127,5 +131,29 @@ class SessionManager {
                 document.getElementById('user-name').style.display = "block";
             }
         }
+    }
+
+    generateCodeVerifier() {
+        const array = new Uint32Array(56 / 2);
+        window.crypto.getRandomValues(array);
+        return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+    }
+
+    async generateCodeChallenge(codeVerifier) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(codeVerifier);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        return btoa(String.fromCharCode(...new Uint8Array(digest)))
+            .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    redirectToAuthEndpoint(codeChallenge) {
+        const authorizationEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+        const redirectUri = window.location.origin; // URI de redirección
+        const scope = 'openid profile email'; // Ajusta los scopes según tus necesidades
+
+        const authUrl = `${authorizationEndpoint}?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+
+        window.location.href = authUrl;
     }
 }

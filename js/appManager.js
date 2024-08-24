@@ -1,4 +1,4 @@
-console.log("Ver: 2.1")
+console.log("Ver: 2.2")
 
 class AppManager {
     constructor(encryptionKey) {
@@ -9,9 +9,12 @@ class AppManager {
         this.isLoading = false;
     }
 
-    initializeApp() {
+    async initializeApp() {
         this.sessionManager.initialize();
         this.handleHashChange();
+
+        // Verificar la autenticación
+        await this.sessionManager.checkAndPromptAuth();
     }
 
     loadInitialView() {
@@ -20,101 +23,6 @@ class AppManager {
         } else {
             this.loadView('apps', 'Apps');
         }
-    }
-
-    preLoadViews(viewNames) {
-        for (let viewName of viewNames) {
-            try {
-                fetch(`views/${viewName}/${viewName}.html`);
-                const link = document.createElement('link');
-                link.rel = 'prefetch';
-                link.href = `views/${viewName}/${viewName}.css`;
-                document.head.appendChild(link);
-
-                const script = document.createElement('script');
-                script.src = `views/${viewName}/${viewName}.js`;
-                script.defer = true;
-                script.setAttribute('data-view-script', '');
-                document.body.appendChild(script);
-            } catch (error) {
-                console.error(`Error preloading view ${viewName}:`, error);
-            }
-        }
-    }
-
-    loadView(viewName, viewTitle) {
-        if (this.isLoading) return;
-        this.isLoading = true;
-
-        console.log(`Loading view: ${viewName}`);
-
-        const contentDiv = document.getElementById('content');
-        contentDiv.style.opacity = 0;
-
-        this.removePreviousAssets();
-
-        setTimeout(() => {
-            fetch(`views/${viewName}/${viewName}.html`)
-                .then(response => response.text())
-                .then(html => {
-                    contentDiv.innerHTML = html;
-
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = `views/${viewName}/${viewName}.css`;
-                    link.setAttribute('data-view-style', '');
-                    document.head.appendChild(link);
-
-                    const script = document.createElement('script');
-                    script.src = `views/${viewName}/${viewName}.js`;
-                    script.defer = true;
-                    script.setAttribute('data-view-script', '');
-                    script.onload = () => {
-                        if (typeof initializeView === 'function') {
-                            initializeView();
-                        }
-                        this.isLoading = false;
-                    };
-                    contentDiv.style.opacity = 1;
-                    document.body.appendChild(script);
-
-                    document.title = viewTitle;
-                })
-                .catch(error => {
-                    console.error('Error al cargar la vista:', error);
-                    this.isLoading = false;
-                });
-        }, 100);
-    }
-
-    removePreviousAssets() {
-        const oldLink = document.querySelector('link[data-view-style]');
-        if (oldLink) {
-            oldLink.remove();
-        }
-
-        const oldScripts = document.querySelectorAll('script[data-view-script]');
-        oldScripts.forEach(script => script.remove());
-    }
-
-    clearAllData() {
-        this.encryptedDB.clear();
-        this.unencryptedDB.clear();
-    }
-
-    handleHashChange() {
-        window.addEventListener('hashchange', () => {
-            const currentHash = window.location.hash.substring(1);
-            if (currentHash && !this.isLoading) {
-                const viewTitle = this.getAppNameById(currentHash);
-                this.loadView(currentHash, viewTitle);
-            }
-        });
-    }
-
-    getAppNameById(id) {
-        const app = window.apps.find(app => app.id === id);
-        return app ? app.name : 'Unknown';
     }
 
     async performAuthenticatedOperation(operation) {

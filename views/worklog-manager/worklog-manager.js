@@ -10,11 +10,13 @@ function initializeView() {
         [], // Data se actualizará dinámicamente
         {}, // Filtros iniciales
         [], // Ítems seleccionados
-        [    { label: 'View Details', action: (itemId) => viewDetails(itemId) },
-        { label: 'Edit', action: (itemId) => editItem(itemId) },
-        { label: 'Delete', action: (itemId) => deleteItem(itemId) }], // Opciones del menú contextual
+        [    
+            { label: 'View Details', action: (itemId) => viewDetails(itemId) },
+            { label: 'Edit', action: (itemId) => editItem(itemId) },
+            { label: 'Delete', action: (itemId) => deleteItem(itemId) }
+        ], // Opciones del menú contextual
         { columnId: 'summary', order: 'asc' }, // Orden por defecto
-        true, // Selección múltiple no permitida
+        true, // Selección múltiple permitida
         handleItemClick // Función a ejecutar al hacer clic en un ítem
     );
 
@@ -61,53 +63,89 @@ function initializeView() {
     }
 
     // Actualiza la lista de issues desde Jira
-    function updateIssues(tableManager) {
-        const jiraToken = appManager.encryptedDB.get('jira_token');
-        // Aquí haces la llamada a la API de Jira para obtener los issues y actualizar la tabla
-        // Ejemplo ficticio:
-        const issues = [
-            { id: 1, summary: 'Issue 1', timeSpent: '2h', link: 'https://jira.example.com/1', status: 'Open' },
-            { id: 2, summary: 'Issue 2', timeSpent: '1h', link: 'https://jira.example.com/2', status: 'In Progress' }
-        ];
-        tableManager.updateData(issues);
+    async function updateIssues(tableManager) {
+        await appManager.performAuthenticatedOperation(async (accessToken) => {
+            const jiraToken = appManager.encryptedDB.get('jira_token');
+            if (!jiraToken) {
+                alert('No Jira token found. Please add your Jira token in the Settings.');
+                return;
+            }
+
+            // Llamada ficticia a la API de Jira para obtener los issues
+            const issues = await fetchIssuesFromJira(jiraToken);
+            tableManager.updateData(issues);
+        });
     }
 
     // Actualiza la lista de eventos desde Google Calendar
-    function updateEvents(tableManager) {
-        const calendarId = document.getElementById('calendar-select').value;
-        const date = document.getElementById('date-input').value;
-        const accessToken = appManager.unencryptedDB.get('access_token');
+    async function updateEvents(tableManager) {
+        await appManager.performAuthenticatedOperation(async (accessToken) => {
+            const calendarId = document.getElementById('calendar-select').value;
+            const date = document.getElementById('date-input').value;
 
-        // Aquí haces la llamada a la API de Google Calendar para obtener los eventos y actualizar la tabla
-        // Ejemplo ficticio:
-        const events = [
-            { id: 1, startTime: '09:00 AM', title: 'Event 1', duration: '1h' },
-            { id: 2, startTime: '11:00 AM', title: 'Event 2', duration: '2h' }
-        ];
-        tableManager.updateData(events);
+            // Llamada ficticia a la API de Google Calendar para obtener los eventos
+            const events = await fetchEventsFromGoogleCalendar(accessToken, calendarId, date);
+            tableManager.updateData(events);
+        });
     }
 
     // Sincroniza el worklog de Jira con los eventos de Calendar
-    function syncWorklog() {
+    async function syncWorklog() {
         const selectedIssue = issuesTable.getSelectedItems()[0];
         const selectedEvent = eventsTable.getSelectedItems()[0];
         const comment = document.getElementById('selectedEventComment').value;
 
-        // Aquí haces la llamada para sincronizar el worklog en Jira usando los datos seleccionados
-        console.log('Sincronizando:', selectedIssue, selectedEvent, comment);
+        if (!selectedIssue || !selectedEvent) {
+            alert('Please select both an issue and an event to sync.');
+            return;
+        }
 
-        // Deshabilitar el botón de sync durante la sincronización
-        document.getElementById('syncButton').disabled = true;
+        await appManager.performAuthenticatedOperation(async (accessToken) => {
+            const jiraToken = appManager.encryptedDB.get('jira_token');
+            if (!jiraToken) {
+                alert('No Jira token found. Please add your Jira token in the Settings.');
+                return;
+            }
 
-        // Simulación de la sincronización y reactivación del botón
-        setTimeout(() => {
-            document.getElementById('syncButton').disabled = false;
-            alert('Worklog sincronizado con éxito');
+            // Llamada ficticia para sincronizar el worklog en Jira usando los datos seleccionados
+            await syncWorklogToJira(jiraToken, selectedIssue, selectedEvent, comment);
 
-            // Deseleccionar los ítems después de sincronizar
-            issuesTable.clearSelection();
-            eventsTable.clearSelection();
-            document.getElementById('selectedEventComment').value = '';
-        }, 2000);
+            // Deshabilitar el botón de sync durante la sincronización
+            document.getElementById('syncButton').disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('syncButton').disabled = false;
+                alert('Worklog synchronized successfully.');
+
+                // Deseleccionar los ítems después de sincronizar
+                issuesTable.clearSelection();
+                eventsTable.clearSelection();
+                document.getElementById('selectedEventComment').value = '';
+            }, 2000);
+        });
+    }
+
+    // Función ficticia para obtener issues de Jira
+    async function fetchIssuesFromJira(jiraToken) {
+        // Aquí harías la llamada real a la API de Jira
+        return [
+            { id: 1, summary: 'Issue 1', timeSpent: '2h', link: 'https://jira.example.com/1', status: 'Open' },
+            { id: 2, summary: 'Issue 2', timeSpent: '1h', link: 'https://jira.example.com/2', status: 'In Progress' }
+        ];
+    }
+
+    // Función ficticia para obtener eventos de Google Calendar
+    async function fetchEventsFromGoogleCalendar(accessToken, calendarId, date) {
+        // Aquí harías la llamada real a la API de Google Calendar
+        return [
+            { id: 1, startTime: '09:00 AM', title: 'Event 1', duration: '1h' },
+            { id: 2, startTime: '11:00 AM', title: 'Event 2', duration: '2h' }
+        ];
+    }
+
+    // Función ficticia para sincronizar el worklog en Jira
+    async function syncWorklogToJira(jiraToken, issue, event, comment) {
+        // Aquí harías la llamada real a la API de Jira para sincronizar el worklog
+        console.log('Syncing worklog:', { jiraToken, issue, event, comment });
     }
 }
