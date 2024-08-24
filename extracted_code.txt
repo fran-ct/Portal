@@ -1,0 +1,1650 @@
+=== "./index.html" ===
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal</title>
+    <link rel="icon" type="image/png" href="images/Crafto.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <div id="header-content">
+            <div id="logo">
+                <img src="images/craftech_logo.png" alt="Crafto Logo">
+            </div>
+            <div id="menu">
+                <div id="apps" class="headerItem" onclick="window.location.hash = 'apps';">
+                    <img src="images/menu_toolbar.svg" alt="Apps Menu">
+                </div>
+                <div id="settings" class="headerItem" style="display: none;">
+                    <img src="images/gear_toolbar.svg" alt="Settings">
+                </div>
+                <div id="help" class="headerItem" style="display: none;">
+                    <img src="images/help_toolbar.svg" alt="Help">
+                </div>
+            </div>
+            <div id="user-info" >
+                <span id="user-name" class="headerItem" style="display: none !important;"></span>
+                <img id="user-image" src="images/default-avatar.png" alt="you" class="headerItem" style="display: none; filter: invert(1) !important" >
+            </div>
+        </div>
+    </header>
+    
+    <div id="content"></div>
+
+    <!-- Archivos JS necesarios para la funcionalidad del frontend -->
+    <script src="js/appList.js" defer></script> <!-- Lista de aplicaciones -->
+    <script src="js/storageDB.js" defer></script> <!-- Manejo del almacenamiento -->
+    <script src="js/appManager.js" defer></script> <!-- Manejo de la aplicación -->
+    <script src="js/index.js" defer></script> <!-- Lista de aplicaciones -->
+    <script src="js/SessionsManager.js" defer></script> <!-- Manejo de la aplicación -->
+</body>
+</html>
+=== "./css/styles.css" ===
+/* Reset básico */
+body, h1, h2, h3, p, ul, li, header {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px !important;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif !important;
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+    line-height: 1.6 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 20px !important;
+}
+
+/* Estilo del header */
+header {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    padding: 9px 15px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 1200px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+#header-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+
+}
+
+
+#menu div img {
+    filter: invert(1) !important;
+}
+
+#logo img {
+    height: 40px !important;
+}
+
+#menu {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    margin-left: auto !important;
+}
+
+#menu div {
+    cursor: pointer !important;
+    height: auto !important; /* Valor por defecto */
+}
+
+#menu img {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+#user-info {
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+    gap: 10px !important;
+    margin-left: 20px !important;
+}
+
+#user-info img {
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+#user-name {
+    display: block !important; /* Visible por defecto */
+}
+
+/* Estilo del contenedor principal */
+#content {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+/* Estilos para pantallas pequeñas (modo vertical o móviles) */
+@media (max-width: 768px) {
+    #user-name {
+        display: none !important; /* Oculta el nombre del usuario */
+    }
+
+    header {
+        padding: 3px 10px !important; /* Cambia el padding del header */
+    }
+
+    #menu {
+        gap: 7px !important;
+    }
+
+    #user-info {
+        gap: 5px !important;
+        margin-left: 7px !important;
+    }
+
+    body {
+        padding: 10px !important;
+    }
+}
+
+
+
+=== "./js/storageDB.js" ===
+var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
+
+
+class StorageDB {
+    constructor(encryptionKey = null) {
+        this.encryptionKey = encryptionKey;
+        this.storage = localStorage;
+    }
+
+    // Establece un valor en la base de datos
+    set(key, value) {
+        let data = JSON.stringify(value);
+        if (this.encryptionKey) {
+            data = this.encrypt(data);
+        }
+        this.storage.setItem(key, data);
+    }
+
+    // Obtiene un valor de la base de datos
+    get(key) {
+        let data = this.storage.getItem(key);
+        if (!data) return null; // Si no hay datos, devuelve null
+
+        if (this.encryptionKey) {
+            data = this.decrypt(data);
+        }
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            console.error(`Error parsing data for key ${key}:`, e);
+            this.remove(key); // Remover el valor corrupto del almacenamiento
+            return null; // Devolver null si ocurre un error al parsear
+        }
+    }
+
+    // Elimina un valor de la base de datos
+    remove(key) {
+        this.storage.removeItem(key);
+    }
+
+    // Limpia la base de datos
+    clear() {
+        this.storage.clear();
+    }
+
+    // Método para encriptar datos usando XOR
+    encrypt(data) {
+        return data.split('').map((char, i) => {
+            return String.fromCharCode(char.charCodeAt(0) ^ this.encryptionKey.charCodeAt(i % this.encryptionKey.length));
+        }).join('');
+    }
+
+    // Método para desencriptar datos usando XOR
+    decrypt(data) {
+        return this.encrypt(data); // XOR es reversible de la misma manera
+    }
+
+    // Decodifica un JWT
+    parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = decodeURIComponent(atob(base64Url).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(base64);
+        } catch (e) {
+            console.error("Error parsing JWT:", e);
+            return null;
+        }
+    }
+
+    // Verifica si un token JWT sigue siendo válido
+    isGtokenValid(token) {
+        const decoded = this.parseJwt(token);
+        if (!decoded) return false; // Si el token no se pudo decodificar, no es válido
+        const currentTime = Math.floor(Date.now() / 1000);
+        return decoded.exp > currentTime;
+    }
+
+    // Verifica si el token de Google ID necesita ser renovado
+    checkGtoken() {
+        const googleIdToken = this.get('google_id_token');
+        return !googleIdToken || !this.isGtokenValid(googleIdToken);
+    }
+}
+=== "./js/index.js" ===
+document.addEventListener('DOMContentLoaded', async () => {
+    const encryptionKey = 'my-global-secret-key';
+    window.appManager = new AppManager(encryptionKey);
+
+    await appManager.initializeApp();
+
+    
+    // Precargar vistas más utilizadas
+    appManager.preLoadViews(['apps']);
+
+    
+    const currentHash = window.location.hash.substring(1);
+    if (currentHash) {
+        const viewTitle = appManager.getAppNameById(currentHash);
+        appManager.loadView(currentHash, viewTitle);
+    } else {
+        appManager.loadInitialView();
+    }
+
+        // Manejar clicks en botones del menú principal
+    document.getElementById('apps').addEventListener('click', () => {
+        appManager.loadView('apps', 'Apps');
+    });
+
+    document.getElementById('settings').addEventListener('click', () => {
+        appManager.loadView('settings', 'Settings');
+    });
+
+    document.getElementById('help').addEventListener('click', () => {
+        appManager.loadView('help', 'Help');
+    });
+});
+
+=== "./js/appManager.js" ===
+console.log("Ver: 1.9")
+
+class AppManager {
+    constructor(encryptionKey) {
+        this.encryptionKey = encryptionKey;
+        this.encryptedDB = new StorageDB(encryptionKey);
+        this.unencryptedDB = new StorageDB();
+        this.sessionManager = new SessionManager(this);
+        this.isLoading = false; // Variable de control para evitar cargas duplicadas
+
+    }
+
+    // Inicializar la aplicación
+    initializeApp() {
+        this.sessionManager.initialize();
+        this.handleHashChange();
+    }
+
+    // Cargar la vista inicial
+    loadInitialView() {
+        if (!this.sessionManager.isSessionActive()) {
+            this.loadView('signin', 'Sign In');
+        } else {
+            this.loadView('apps', 'Apps');
+        }
+    }
+
+    preLoadViews(viewNames) {
+        for (let viewName of viewNames) {
+            try {
+                fetch(`views/${viewName}/${viewName}.html`);
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = `views/${viewName}/${viewName}.css`;
+                document.head.appendChild(link);
+
+                const script = document.createElement('script');
+                script.src = `views/${viewName}/${viewName}.js`;
+                script.defer = true;
+                script.setAttribute('data-view-script', '');
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error(`Error preloading view ${viewName}:`, error);
+            }
+        }
+    }
+
+    // Cargar una vista específica
+    loadView(viewName, viewTitle) {
+        if (this.isLoading) return;
+        this.isLoading = true;
+
+        console.log(`Loading view: ${viewName}`);
+
+        const contentDiv = document.getElementById('content');
+        contentDiv.style.opacity = 0;
+
+
+        // Eliminar el CSS y JS anteriores
+        this.removePreviousAssets();
+
+        setTimeout(() => {
+            fetch(`views/${viewName}/${viewName}.html`)
+                .then(response => response.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+
+                    // Lazy load CSS
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = `views/${viewName}/${viewName}.css`;
+                    link.setAttribute('data-view-style', '');
+                    document.head.appendChild(link);
+
+                    // Lazy load JS
+                    const script = document.createElement('script');
+                    script.src = `views/${viewName}/${viewName}.js`;
+                    script.defer = true;
+                    script.setAttribute('data-view-script', '');
+                    script.onload = () => {
+                        if (typeof initializeView === 'function') {
+                            initializeView();
+                        }
+                        this.isLoading = false;
+                    };
+                    contentDiv.style.opacity = 1;
+                    document.body.appendChild(script);
+
+                    document.title = viewTitle;
+                })
+                .catch(error => {
+                    console.error('Error al cargar la vista:', error);
+                    this.isLoading = false;
+                });
+        }, 100); // Tiempo de la transición
+    }
+
+
+
+
+    removePreviousAssets() {
+        // Eliminar el CSS anterior
+        const oldLink = document.querySelector('link[data-view-style]');
+        if (oldLink) {
+            oldLink.remove();
+        }
+
+        // Eliminar los scripts anteriores
+        const oldScripts = document.querySelectorAll('script[data-view-script]');
+        oldScripts.forEach(script => script.remove());
+    }
+
+
+    // Limpiar todos los datos
+    clearAllData() {
+        this.encryptedDB.clear();
+        this.unencryptedDB.clear();
+    }
+
+    // Método para manejar el cambio de hash
+    handleHashChange() {
+        window.addEventListener('hashchange', () => {
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash && !this.isLoading) { // Verifica si no está cargando
+                const viewTitle = this.getAppNameById(currentHash);
+                this.loadView(currentHash, viewTitle);
+            }
+        });
+    }
+
+
+    // Obtener el nombre de la aplicación por su ID
+    getAppNameById(id) {
+        const app = window.apps.find(app => app.id === id);
+        return app ? app.name : 'Unknown';
+    }
+}
+
+
+=== "./js/SessionsManager.js" ===
+class SessionManager {
+    constructor(appManager) {
+        this.appManager = appManager;
+        this.authAttempted = false; // Para rastrear si se intentó la autenticación
+    }
+
+    // Inicializa la autenticación con Google y el manejo de sesión
+    initialize() {
+        google.accounts.id.initialize({
+            client_id: CLIENT_ID,
+            callback: this.handleCredentialResponse.bind(this),
+            scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
+            auto_select: true,
+            ux_mode: "popup",
+            context: "signin",
+            cancel_on_tap_outside: true,
+            prompt_parent_id: "signInButtonContainer",
+            auto_prompt: false
+        });
+        this.promptGoogleSignIn();
+    }
+
+    // Solicita el inicio de sesión si no hay una sesión activa
+    promptGoogleSignIn() {
+        if (this.authAttempted) return; // Evitar múltiples intentos
+        this.authAttempted = true; // Marcar como que ya se intentó la autenticación
+
+        if (!this.isSessionActive()) {
+            google.accounts.id.prompt();
+        } else {
+            this.updateUIWithUserProfile();
+        }
+    }
+
+    // Maneja la respuesta de credenciales de Google
+    async handleCredentialResponse(response) {
+        const idToken = response.credential;
+        this.appManager.unencryptedDB.set('google_id_token', idToken);
+
+        const profile = this.appManager.unencryptedDB.parseJwt(idToken);
+        this.appManager.unencryptedDB.set('user_profile', profile);
+
+        if (this.validateIdToken(idToken)) {
+            try {
+                const accessToken = await this.fetchAccessToken(idToken);
+                if (accessToken) {
+                    this.appManager.unencryptedDB.set('google_access_token', accessToken);
+                    this.updateUIWithUserProfile(profile);
+                    this.appManager.loadInitialView();
+                } else {
+                    throw new Error("Access token is null or undefined.");
+                }
+            } catch (error) {
+                console.error('Error fetching access token:', error);
+                alert('Failed to authenticate. Please try again.');
+                this.logout();
+            }
+        } else {
+            alert('ID Token is invalid or expired. Please sign in again.');
+            this.logout();
+        }
+    }
+
+
+    // Método para obtener el Access Token usando OAuth2
+    async fetchAccessToken(idToken) {
+        const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch access token');
+        }
+        const data = await response.json();
+        return data.access_token || null; // Aquí ya tendrás el Access Token
+    }
+
+    // Validación del ID Token
+    validateIdToken(idToken) {
+        const parsedToken = this.appManager.unencryptedDB.parseJwt(idToken);
+        const currentTime = Math.floor(Date.now() / 1000);
+        return parsedToken && parsedToken.exp > currentTime;
+    }
+
+    // Validación del Access Token
+    async validateAccessToken(accessToken) {
+        if (!accessToken) return false;
+
+        try {
+            const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
+            const data = await response.json();
+            return data && data.expires_in > 0; // Verifica si el token sigue siendo válido
+        } catch (error) {
+            console.error('Failed to validate access token:', error);
+            return false;
+        }
+    }
+
+    // Verifica si la sesión está activa
+    async isSessionActive() {
+        const googleAccessToken = this.appManager.unencryptedDB.get('google_access_token');
+        return googleAccessToken && await this.validateAccessToken(googleAccessToken);
+    }
+
+    // Actualiza la interfaz con la información del perfil del usuario
+    updateUIWithUserProfile(profile = null) {
+        if (!profile) {
+            profile = this.appManager.unencryptedDB.get('user_profile');
+        }
+        if (profile) {
+            document.getElementById('user-name').textContent = profile.name;
+            document.getElementById('user-image').src = profile.picture;
+            document.getElementById('user-image').style.filter = 'none';
+            document.getElementById('user-image').alt = profile.email;
+            document.getElementById('user-image').style.display = "block";
+            document.getElementById('user-name').style.display = "block";
+            document.getElementById('apps').style.display = "block";
+            document.getElementById('help').style.display = "block";
+            document.getElementById('settings').style.display = "block";
+        }
+
+    }
+
+    // Maneja la desconexión de la sesión
+    logout() {
+        const confirmation = confirm("Are you sure you want to log out? All stored data will be erased.");
+
+        if (confirmation) {
+            // this.appManager.clearAllData();
+            this.appManager.loadView('signin', 'Sign In');
+            this.promptGoogleSignIn();
+        }
+    }
+}
+=== "./js/appList.js" ===
+window.apps = [
+    {
+        id: 'worklog-manager',
+        name: 'Worklog Manager',
+        comment: 'Manage your worklogs',
+        group: 'public'
+    },
+    {
+        id: 'settings',
+        name: 'Settings',
+        comment: 'Adjust your Portal settings',
+        group: 'public'
+    },
+    {
+        id: 'help',
+        name: 'Help',
+        comment: 'Find help and documentation',
+        group: 'public'
+    },
+    {
+        id: 'apps',
+        name: 'Apps',
+        comment: 'Select an Application',
+        group: 'system'
+    },
+    {
+        id: 'signin',
+        name: 'Sign in',
+        comment: 'Google one tap login view',
+        group: 'home'
+    },
+    {
+        id: 'loading',
+        name: 'Loading...',
+        comment: 'View shown when a view change (only for system)',
+        group: 'system'
+    }
+];
+=== "./views/settings/settings.css" ===
+/* Settings View Specific Styles */
+#settings-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.container {
+    min-width: 500px;
+    max-width: 800px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+#settings-container h2 {
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+#settings-subcontainer {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.container a {
+    color: grey;
+}
+
+.container input {
+    width: 100%;
+    padding: 0.3rem;
+    background-color: #444;
+    border: none;
+    color: #e0e0e0;
+}=== "./views/settings/settings.html" ===
+<div class="app settings-view" id="settings-view">
+    <h2>Settings</h2>
+    <div class="container z-depth-3" id="settings-container">
+
+        <h3>Jira Token</h3>
+        <div class="token-input-container">
+            <input type="password" id="jira-token-input" placeholder="Insert your Jira token to start">
+            <button type="button" id="toggle-jira-token-visibility" class="toggle-visibility"> 👁️ </button>
+        </div>
+        <button type="submit" id="save-jira-token-btn">Save</button>
+        <button type="button" id="delete-jira-token-btn">Delete</button>
+        <span id="jira-token-status" class="token-status"></span>
+        <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">Get your Jira token here</a>
+    </div>
+
+    <div class="container z-depth-3">
+
+        <h3>User Data</h3>
+        <!-- Logout and Clear Data Buttons -->
+        <div class="action-buttons">
+            <button type="button" id="logout-btn">Log Out</button>
+            <button type="button" id="clear-data-btn">Clear Local Data</button>
+        </div>
+    </div>
+
+</div>=== "./views/settings/settings.js" ===
+function initializeView() {
+    const jiraTokenInput = document.getElementById('jira-token-input');
+    const saveJiraTokenBtn = document.getElementById('save-jira-token-btn');
+    const deleteJiraTokenBtn = document.getElementById('delete-jira-token-btn');
+    const toggleJiraTokenVisibility = document.getElementById('toggle-jira-token-visibility');
+    const jiraTokenStatus = document.getElementById('jira-token-status');
+    const logoutBtn = document.getElementById('logout-btn');
+    const clearDataBtn = document.getElementById('clear-data-btn');
+
+    const encryptionKey = 'my-global-secret-key';
+    const appManager = new AppManager(encryptionKey);
+
+    // Verificar si el usuario está autenticado
+    const idToken = appManager.unencryptedDB.get('google_id_token');
+    if (!idToken) {
+        alert('You must be logged in to manage tokens.');
+        appManager.loadView('signin', 'Sign In');
+        return;
+    }
+
+    // Mostrar el estado del token de Jira
+    if (appManager.encryptedDB.get('jira_token')) {
+        jiraTokenStatus.textContent = 'Token stored';
+        jiraTokenStatus.style.color = 'green';
+    } else {
+        jiraTokenStatus.textContent = 'No token stored';
+        jiraTokenStatus.style.color = 'red';
+    }
+
+    // Guardar el token de Jira
+    saveJiraTokenBtn.addEventListener('click', () => {
+        const token = jiraTokenInput.value;
+        appManager.encryptedDB.set('jira_token', token);
+        jiraTokenStatus.textContent = 'Token stored';
+        jiraTokenStatus.style.color = 'green';
+        alert('Jira token saved successfully.');
+    });
+
+    // Eliminar el token de Jira
+    deleteJiraTokenBtn.addEventListener('click', () => {
+        appManager.encryptedDB.remove('jira_token');
+        jiraTokenStatus.textContent = 'No token stored';
+        jiraTokenStatus.style.color = 'red';
+        alert('Jira token deleted successfully.');
+    });
+
+    // Cerrar sesión
+    logoutBtn.addEventListener('click', () => {
+       appManager.sessionManager.logout();
+    });
+
+    // Limpiar todos los datos locales
+    clearDataBtn.addEventListener('click', () => {
+        appManager.clearAllData();
+        alert('All data cleared.');
+    });
+
+    // Alternar la visibilidad del token de Jira
+    toggleJiraTokenVisibility.addEventListener('click', () => {
+        if (jiraTokenInput.type === 'password') {
+            jiraTokenInput.type = 'text';
+            toggleJiraTokenVisibility.textContent = 'Hide';
+        } else {
+            jiraTokenInput.type = 'password';
+            toggleJiraTokenVisibility.textContent = 'Show';
+        }
+    });
+}
+=== "./views/loading/loading.css" ===
+/* Settings View Specific Styles */
+#settings-view {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+#settings-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+}
+
+#settings-container h2 {
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+#settings-subcontainer {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+}
+=== "./views/loading/loading.html" ===
+<div class="app settings-view" id="settings-view">
+    <h2>Loading...</h2>
+</div>
+=== "./views/loading/settings.js" ===
+function initializeView() {
+
+
+}
+
+
+
+=== "./views/worklog-manager/worklog-manager.html" ===
+
+
+<div class="app worklog-manager" id="worklog-manager">
+    <div class="container z-depth-3" id="container1">
+        <div id="filter-issues" class="subContainer z-depth-2">
+            <div class="filterRow">
+                <label for="squadId">Squad:</label>
+                <select id="squadId" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="project">Project:</label>
+                <select id="project" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="assignee">Assignee:</label>
+                <select id="assignee" class="browser-default"></select>
+            </div>
+            <div class="filterRow">
+                <label for="searchIssue">Search:</label>
+                <input type="text" id="searchIssue" placeholder="Start writing to filter" />
+            </div>
+        </div>
+        <div class="issues z-depth-2">
+            <table id="issuesTable">
+                <thead>
+                    <tr>
+                        <th>Summary</th>
+                        <th class="center-text">Spent</th>
+                        <th>Link</th>
+                        <th class="center-text">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Implement login feature</td>
+                        <td class="center-text">3h </td>
+                        <td><a href="https://example.com/issue/1234" target="_blank">#1234</a></td>
+                        <td class="center-text">In Progress</td>
+                    </tr>
+                    <tr>
+                        <td>Fix bug in payment processing</td>
+                        <td class="center-text">2h</td>
+                        <td><a href="https://example.com/issue/5678" target="_blank">#5678</a></td>
+                        <td class="center-text">Done</td>
+                    </tr>
+                    <tr>
+                        <td>Update user dashboard</td>
+                        <td class="center-text">30m</td>
+                        <td><a href="https://example.com/issue/9101" target="_blank">#9101</a></td>
+                        <td class="center-text">To Do</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="container-group">
+        <div class="container z-depth-3" id="container2">
+            <div id="filter-events" class="subContainer z-depth-2">
+                <div class="calendar-filter-block">
+                    <label for="calendar-select">Calendar:</label>
+                    <select id="calendar-select" class="browser-default"></select>
+                </div>
+
+                <div class="calendar-filter-block">
+                    <label for="date-input">Date:</label>
+                    <input type="date" id="date-input" />
+                </div>
+
+                <div class="buttonRow">
+                    <button id="updateEvents-btn">Update</button>
+                </div>
+            </div>
+            <div class="events z-depth-2">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Title</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:00 AM</td>
+                            <td>Daily Standup</td>
+                            <td>30m</td>
+                        </tr>
+                        <tr>
+                            <td>11:00 AM</td>
+                            <td>Client Meeting</td>
+                            <td>1h</td>
+                        </tr>
+                        <tr>
+                            <td>02:00 PM</td>
+                            <td>Code Review</td>
+                            <td>1h 15m</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+        <div class="container z-depth-3" id="container3">
+            <div>
+                <input type="text" class="toComment" id="selectedEventComment" placeholder="Comment" />
+            </div>
+            <div class="buttonRow button-container">
+                <button id="syncButton">Sync</button>
+            </div>
+        </div>
+    </div>
+</div>=== "./views/worklog-manager/worklog-manager.js" ===
+// Check if the variables are already defined
+if (typeof issues === 'undefined') {
+    var issues = [];
+}
+if (typeof selectedIssue === 'undefined') {
+    var selectedIssue = null;
+}
+if (typeof selectedEvent === 'undefined') {
+    var selectedEvent = null;
+}
+
+function initializeView() {
+
+    // Verificar si el usuario está autenticado
+    if (!appManager.sessionManager.isSessionActive()) {
+        alert('You must be logged in to use the Worklog Manager.');
+        appManager.loadView('signin', 'Sign In');
+        return;
+    }
+
+    // Cargar los calendarios disponibles y los eventos del día
+    loadAvailableCalendars();
+    filterEvents();
+
+    // Configurar los eventos para los selectores de calendario y fecha
+    document.getElementById('calendar-select').addEventListener('change', filterEvents);
+    document.getElementById('date-input').addEventListener('change', filterEvents);
+    document.getElementById('updateEvents-btn').addEventListener('click', filterEvents);
+
+    // Cargar los issues de Jira desde Google Sheets
+    loadIssuesFromSpreadsheet();
+
+    // Configurar los filtros de issues
+    document.getElementById('squadId').addEventListener('change', filterIssues);
+    document.getElementById('project').addEventListener('change', filterIssues);
+    document.getElementById('assignee').addEventListener('change', filterIssues);
+    document.getElementById('searchIssue').addEventListener('input', filterIssues);
+
+    // Configurar el botón de sincronización
+    document.getElementById('syncButton').addEventListener('click', syncWorklog);
+}
+
+// Cargar calendarios desde Google Calendar
+function loadAvailableCalendars() {
+    const accessToken = appManager.unencryptedDB.get('access_token');
+    fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.items) {
+            populateCalendars(data.items);
+            document.getElementById('calendar-select').value = data.items[0].id; // Seleccionar el primer calendario por defecto
+        } else {
+            showError('Error loading calendars.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Calendar API.');
+    });
+}
+
+// Llenar el select de calendarios
+function populateCalendars(calendars) {
+    const calendarSelect = document.getElementById('calendar-select');
+    calendarSelect.innerHTML = '';
+    calendars.forEach(calendar => {
+        const option = document.createElement('option');
+        option.value = calendar.id;
+        option.textContent = calendar.summary;
+        calendarSelect.appendChild(option);
+    });
+}
+
+// Filtrar y mostrar eventos desde Google Calendar
+function filterEvents() {
+    const dateInput = document.getElementById('date-input').value;
+    const calendarId = document.getElementById('calendar-select').value;
+    const accessToken = appManager.unencryptedDB.get('access_token');
+
+    // Ensure we have a valid date
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) {
+        showError('Invalid date selected');
+        return;
+    }
+
+    const timeMin = date.toISOString();
+    const timeMax = new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+    fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${timeMin}&timeMax=${timeMax}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.items) {
+            updateEventsList(data.items);
+        } else {
+            showError('Error loading events.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Calendar API.');
+    });
+}
+
+// Actualizar la lista de eventos en la UI
+function updateEventsList(events) {
+    const list = document.querySelector("#eventsTable tbody");
+    list.innerHTML = '';
+    events.forEach(event => {
+        const row = document.createElement('tr');
+        row.classList.add('event-row');
+        row.id = event.id;
+
+        const startTimeCol = document.createElement('td');
+        startTimeCol.textContent = moment(event.start.dateTime).format("HH:mm");
+
+        const titleCol = document.createElement('td');
+        titleCol.textContent = event.summary;
+
+        const durationCol = document.createElement('td');
+        const start = moment(event.start.dateTime);
+        const end = moment(event.end.dateTime);
+        durationCol.textContent = moment.duration(end.diff(start)).humanize();
+
+        row.appendChild(startTimeCol);
+        row.appendChild(titleCol);
+        row.appendChild(durationCol);
+        list.appendChild(row);
+    });
+
+    // Configurar el evento de selección de fila
+    document.querySelectorAll('.event-row').forEach(row => {
+        row.addEventListener('click', function () {
+            selectEvent(row.id);
+        });
+    });
+}
+
+// Seleccionar un evento
+function selectEvent(eventId) {
+    const event = events.find(e => e.id === eventId);
+    if (event) {
+        selectedEvent = event;
+        document.getElementById('selectedEventComment').value = event.summary;
+        document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
+        document.getElementById(eventId).classList.add('selected');
+    }
+}
+
+// Cargar issues desde Google Sheets
+function loadIssuesFromSpreadsheet() {
+    const spreadsheetId = 'YOUR_SPREADSHEET_ID';
+    const range = 'Sheet1!A:G'; // Ajusta el rango según tu hoja de cálculo
+    const accessToken = appManager.unencryptedDB.get('access_token');
+
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.values) {
+            issues = data.values.map(row => ({
+                id: row[0],
+                summary: row[1],
+                squadId: row[2],
+                project: row[3],
+                assigneeName: row[4],
+                status: row[5],
+                timespent: row[6]
+            }));
+            populateIssueFilters(issues);
+            updateIssuesTable(issues);
+        } else {
+            showError('Error loading issues from spreadsheet.');
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Google Sheets API.');
+    });
+}
+
+// Llenar los selectores de filtros de issues
+function populateIssueFilters(issues) {
+    const squads = removeDups(issues.map(issue => issue.squadId));
+    populateSelectOptions('squadId', squads);
+
+    const projects = removeDups(issues.map(issue => issue.project));
+    populateSelectOptions('project', projects);
+
+    const assignees = removeDups(issues.map(issue => issue.assigneeName));
+    populateSelectOptions('assignee', assignees);
+}
+
+// Llenar un select con opciones
+function populateSelectOptions(elementId, options) {
+    const select = document.getElementById(elementId);
+    select.innerHTML = '<option value="Select">Select</option>';
+    options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option;
+        opt.textContent = option;
+        select.appendChild(opt);
+    });
+}
+
+// Filtrar issues en la tabla
+function filterIssues() {
+    const squadId = document.getElementById('squadId').value;
+    const project = document.getElementById('project').value;
+    const assignee = document.getElementById('assignee').value;
+    const searchText = document.getElementById('searchIssue').value.toLowerCase();
+
+    let filteredIssues = issues;
+
+    if (squadId !== "Select") {
+        filteredIssues = filteredIssues.filter(issue => issue.squadId === squadId);
+    }
+    if (project !== "Select") {
+        filteredIssues = filteredIssues.filter(issue => issue.project === project);
+    }
+    if (assignee !== "Select") {
+        filteredIssues = filteredIssues.filter(issue => issue.assigneeName === assignee);
+    }
+    if (searchText) {
+        filteredIssues = filteredIssues.filter(issue => issue.summary.toLowerCase().includes(searchText));
+    }
+
+    updateIssuesTable(filteredIssues);
+}
+
+// Actualizar la tabla de issues en la UI
+function updateIssuesTable(filteredIssues) {
+    const tableBody = document.querySelector("#issuesTable tbody");
+    tableBody.innerHTML = '';
+    filteredIssues.forEach(issue => {
+        const row = document.createElement('tr');
+        row.classList.add('issue-row');
+        row.id = issue.id;
+
+        const summaryCol = document.createElement('td');
+        summaryCol.textContent = issue.summary;
+
+        const spentCol = document.createElement('td');
+        spentCol.classList.add('center-text');
+        spentCol.textContent = issue.timespent ? moment.duration(issue.timespent, 'seconds').humanize() : 'none';
+
+        const linkCol = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = `https://your-jira-domain.atlassian.net/browse/${issue.key}`;
+        link.target = '_blank';
+        link.textContent = issue.key;
+        linkCol.appendChild(link);
+
+        const statusCol = document.createElement('td');
+        statusCol.classList.add('center-text');
+        statusCol.textContent = issue.status;
+
+        row.appendChild(summaryCol);
+        row.appendChild(spentCol);
+        row.appendChild(linkCol);
+        row.appendChild(statusCol);
+        tableBody.appendChild(row);
+    });
+
+    // Configurar el evento de selección de fila
+    document.querySelectorAll('.issue-row').forEach(row => {
+        row.addEventListener('click', function () {
+            selectIssue(row.id);
+        });
+    });
+}
+
+// Seleccionar un issue
+function selectIssue(issueId) {
+    const issue = issues.find(i => i.id === issueId);
+    if (issue) {
+        selectedIssue = issue;
+        document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
+        document.getElementById(issueId).classList.add('selected');
+        document.getElementById('selectedIssueKey').value = issue.key;
+    }
+}
+
+// Sincronizar worklog a Jira
+function syncWorklog() {
+    if (!selectedIssue || !selectedEvent) {
+        showError('Please select both an issue and an event to sync.');
+        return;
+    }
+
+    const comment = document.getElementById('selectedEventComment').value;
+    const duration = moment.duration(moment(selectedEvent.end.dateTime).diff(moment(selectedEvent.start.dateTime))).asSeconds();
+    const jiraToken = appManager.encryptedDB.get('jira_token');
+
+    fetch(`https://your-jira-domain.atlassian.net/rest/api/2/issue/${selectedIssue.key}/worklog`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${btoa('your-email:' + jiraToken)}`, // Asumiendo que usas Basic Auth
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            timeSpentSeconds: duration,
+            comment: comment,
+            started: moment(selectedEvent.start.dateTime).toISOString()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
+            document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
+            document.getElementById('selectedEventComment').value = '';
+            showSuccess('Worklog uploaded successfully.');
+        } else {
+            showError('Error uploading worklog: ' + data.message);
+        }
+    })
+    .catch(error => {
+        showError('Error communicating with Jira API.');
+    });
+}
+
+// Mostrar errores
+function showError(message) {
+    console.error(message);
+    // Puedes implementar un sistema de notificación visual aquí si lo deseas.
+}
+
+// Mostrar éxito
+function showSuccess(message) {
+    console.log(message);
+    // Implementar notificación visual de éxito si es necesario
+}
+
+// Eliminar duplicados de una lista
+function removeDups(list) {
+    let unique = {};
+    list.forEach(function (i) {
+        unique[i] = true;
+    });
+    return Object.keys(unique);
+}
+=== "./views/worklog-manager/worklog-manager.css" ===
+/* Worklog Manager Specific Styles */
+#worklog-manager {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+}
+
+td {
+    font-size: 0.9rem;
+}
+
+label {
+    font-size: 0.8rem;
+    flex: 0.3;
+}
+
+
+
+select, input {
+    padding: 0.3rem;
+    background-color: #444;
+    border: none;
+    color: #e0e0e0;
+    flex: 1;
+
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+
+#content {
+    margin-top: 20px;
+    padding: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: none;
+    background-color: transparent !important;
+}
+
+.container {
+    background-color: #1e1e1e;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+}
+
+#container1{
+    flex: 1;
+}
+
+
+.subContainer {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
+}
+
+
+.container-group{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+
+}
+
+.issues,
+.events {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+#issuesTable,
+#eventsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#eventsTable {
+    border-radius: 8px;
+}
+
+#issuesTable th,
+#eventsTable th,
+#issuesTable td,
+#eventsTable td {
+    padding: 0.3rem;
+    border-bottom: 1px solid #333;
+}
+
+#updateEvents-btn {
+    margin-top: 12px;
+}
+
+
+th {
+    background-color: #333;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+td {
+    color: #b3b3b3;
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+tr {
+    height: 25px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.filterRow,
+.calendar-filter-block {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 0.3rem 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.button-container {
+    margin-top: 22px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+}
+
+#selectedEventComment {
+    width: calc(100% - 14px);
+}
+
+
+
+
+
+@media (max-width: 768px) {
+    td {
+        font-size: 0.9rem;
+    }
+
+    #worklog-manager {
+        display: flex;
+        column-gap: 10px;
+        row-gap: 15px;
+        flex-wrap: wrap;
+        flex-direction: column;
+    
+    }
+    .container-group{
+        column-gap: 10px;
+        row-gap: 15px;
+    }
+    
+}
+
+
+@media (max-width: 450px) {
+    td {
+        font-size: 0.8rem;
+    }
+    th {
+        font-size: 0.9rem;
+    }
+
+}=== "./views/signin/signin.js" ===
+function initializeView() {
+    const googleIdToken = appManager.unencryptedDB.get('google_id_token');
+    const googleAccessToken = appManager.unencryptedDB.get('google_access_token');
+
+    if (googleIdToken && appManager.unencryptedDB.isGtokenValid(googleIdToken) &&
+        googleAccessToken && appManager.sessionManager.validateAccessToken(googleAccessToken)) {
+
+        const profile = appManager.unencryptedDB.get('user_profile');
+
+        // Mostrar mensaje de que ya está autenticado
+        document.getElementById('signInMessage').textContent = `You are already signed in as ${profile.name}.`;
+
+        // Calcular y mostrar la fecha de expiración del token en la consola
+        const decodedToken = appManager.unencryptedDB.parseJwt(googleIdToken);
+        const expirationDate = new Date(decodedToken.exp * 1000);
+        console.log(`Token expires at: ${expirationDate}`);
+
+        // Ocultar el botón de iniciar sesión
+        document.getElementById('signInButton').style.display = 'none';
+    } else {
+        // Renderizar el botón de Google Sign-In si no está autenticado
+        google.accounts.id.renderButton(
+            document.getElementById("signInButton"),
+            { theme: "outline", size: "large", text: "signin", shape: "pill" }
+        );
+
+        // Opcional: puedes solicitar el inicio de sesión automático si es necesario
+        google.accounts.id.prompt(); // Solo si deseas solicitar automáticamente el inicio de sesión
+    }
+}
+=== "./views/signin/signin.css" ===
+.asd{
+    color: blue;
+}
+
+#content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}=== "./views/signin/signin.html" ===
+<body>
+    <h2>Sign in with Google</h2>
+
+    <!-- Mensaje de autenticación -->
+    <div id="signInMessage"></div>
+
+    <!-- Botón de Google Sign-In -->
+    <div id="signInButton"></div>
+</body>
+
+</html>
+=== "./views/apps/apps.js" ===
+function initializeView() {
+  const appListContainer = document.getElementById('apps-list');
+  const apps = window.apps.filter(app => app.group !== 'system');
+
+  apps.forEach(app => {
+      const appItem = document.createElement('div');
+      appItem.className = 'app-item';
+      appItem.onclick = () => {
+          appManager.loadView(app.id, app.name);
+      };
+
+      const appTitle = document.createElement('h3');
+      appTitle.textContent = app.name;
+
+      const appDescription = document.createElement('p');
+      appDescription.textContent = app.comment;
+
+      appItem.appendChild(appTitle);
+      appItem.appendChild(appDescription);
+      appListContainer.appendChild(appItem);
+  });
+}
+=== "./views/apps/apps.html" ===
+<div class="container z-depth-3 apps-list" id="apps-list">
+    <!-- Aquí se renderizarán dinámicamente las aplicaciones -->
+</div>=== "./views/apps/apps.css" ===
+#apps-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.app-item {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex: 1 1 calc(33.333% - 20px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.app-item h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.app-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+#content {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+    #apps-list {
+        flex-direction: column;
+    }
+}
+
+
+
+s
+/* Estilo para el contenedor de la lista de aplicaciones */
+#app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilo para cada tarjeta (card) de la aplicación */
+.app-item {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-item h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4285f4;
+}
+
+.app-item p {
+    color: #b3b3b3;
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+}
+=== "./views/help/help.html" ===
+<div class="app help-view" id="help-view">
+    <div class="container z-depth-3" id="help-container">
+        <h2>Help</h2>
+        <div class="sub-container" id="help-subcontainer">
+            <p>Welcome to the help section. Here you will find guidance and documentation.</p>
+        </div>
+    </div>
+</div>=== "./views/help/help.js" ===
+function initializeView() {
+
+
+}
+
+
+
+=== "./views/help/help.css" ===
+/* Help View Specific Styles */
+#help-view {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+#help-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
+}
+
+#help-container h2 {
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+#help-subcontainer {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+}

@@ -4,8 +4,17 @@
     gap: 20px;
     flex-wrap: wrap;
     flex-direction: row;
-
 }
+
+tr.selected {
+    background-color: #722424; /* Cambia este color según tu preferencia */
+    color: #fff; /* Texto blanco para mayor contraste */
+}
+tr.selected:hover {
+    background-color: #420b0b; /* Mismo color que la selección */
+    color: #fff; /* Color de texto que contraste */
+}
+
 
 td {
     font-size: 0.9rem;
@@ -16,23 +25,18 @@ label {
     flex: 0.3;
 }
 
-
-
 select, input {
     padding: 0.3rem;
     background-color: #444;
     border: none;
     color: #e0e0e0;
     flex: 1;
-
 }
 
 .buttonRow {
     display: flex;
     justify-content: flex-end;
-
 }
-
 
 #content {
     margin-top: 20px;
@@ -54,11 +58,6 @@ select, input {
     box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
 }
 
-#container1{
-    flex: 1;
-}
-
-
 .subContainer {
     padding: 10px;
     margin-bottom: 15px;
@@ -66,13 +65,11 @@ select, input {
     box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
 }
 
-
-.container-group{
+.container-group {
     display: flex;
     flex-direction: column;
     gap: 20px;
     flex: 1;
-
 }
 
 .issues,
@@ -99,11 +96,6 @@ select, input {
     padding: 0.3rem;
     border-bottom: 1px solid #333;
 }
-
-#updateEvents-btn {
-    margin-top: 12px;
-}
-
 
 th {
     background-color: #333;
@@ -163,10 +155,6 @@ button:disabled {
     width: calc(100% - 14px);
 }
 
-
-
-
-
 @media (max-width: 768px) {
     td {
         font-size: 0.9rem;
@@ -178,15 +166,12 @@ button:disabled {
         row-gap: 15px;
         flex-wrap: wrap;
         flex-direction: column;
-    
     }
-    .container-group{
+    .container-group {
         column-gap: 10px;
         row-gap: 15px;
     }
-    
 }
-
 
 @media (max-width: 450px) {
     td {
@@ -195,5 +180,55 @@ button:disabled {
     th {
         font-size: 0.9rem;
     }
+}
 
+
+
+/* menu contextual
+/* Estilo básico del menú contextual */
+.context-menu {
+    position: absolute;
+    background-color: #2c2c2c;
+    border: 1px solid #555;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    padding: 5px 0;
+    width: 200px;
+}
+
+/* Estilo para los elementos del menú */
+.context-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    color: #ddd;
+    font-size: 14px;
+}
+
+/* Efecto hover para los elementos del menú */
+.context-menu-item:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Estilo para separar los elementos */
+.context-menu-item + .context-menu-item {
+    border-top: 1px solid #444;
+}
+
+
+
+
+/* Estilo para Ordenamiento tabla */
+th.sortable {
+    cursor: pointer;
+}
+
+th.sort-asc::after {
+
+    /* content: ' ▲'; /* You can customize this arrow */
+}
+
+th.sort-desc::after {
+    /* content: ' ▼'; /* You can customize this arrow */
 }
