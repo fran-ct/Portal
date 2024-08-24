@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Callback</title>
-    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1.11.5/dist/oidc-client.min.js"></script> <!-- Cargar desde la CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1.11.5/dist/oidc-client.min.js"></script>
     <script>
-        console.log('Session Storage:', sessionStorage);
-        console.log('Local Storage:', localStorage);
-        new Oidc.UserManager().signinRedirectCallback().then(function() {
-            window.location.href = "/Portal";  // Redirige a la página principal después de autenticarse
-        }).catch(function(err) {
-            console.error("Error during callback processing:", err);
-    console.log("State expected vs received:", err.state);
-    alert("Error during callback processing. Check console for details.");
+        document.addEventListener('DOMContentLoaded', function() {
+            const oidcSettings = {
+                userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage })  // Fuerza el uso de sessionStorage en callback
+            };
+            const userManager = new Oidc.UserManager(oidcSettings);
+            userManager.signinRedirectCallback().then(function() {
+                console.log("Authentication successful");
+                window.location.href = "/Portal";
+            }).catch(function(err) {
+                console.error("Error during callback processing:", err);
+                console.log("State expected vs received:", err.state);
+                alert("Error during callback processing. Check console for details.");
+            });
         });
     </script>
 </head>
