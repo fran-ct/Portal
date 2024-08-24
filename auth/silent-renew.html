@@ -6,8 +6,11 @@
     <title>Silent Renew</title>
     <script src="https://cdn.jsdelivr.net/npm/oidc-client@1.11.5/dist/oidc-client.min.js"></script> <!-- Cargar desde la CDN -->
     <script>
-        new Oidc.UserManager().signinSilentCallback().catch(function(err) {
-            console.error("Error during silent renew:", err);
+        new Oidc.UserManager().signinRedirectCallback().then(function() {
+            window.location.href = "/Portal";  // Redirige a la página principal después de autenticarse
+        }).catch(function(err) {
+            console.error("Error during callback processing:", err);  // Loguea el error para ver detalles
+            alert("Error during callback processing");
         });
     </script>
 </head>
