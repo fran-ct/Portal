@@ -7,7 +7,7 @@ class AppManager {
         this.unencryptedDB = new StorageDB();
         this.sessionManager = new SessionManager(this);
         this.isLoading = false; // Variable de control para evitar cargas duplicadas
-   
+
     }
 
     // Inicializar la aplicación
@@ -25,33 +25,54 @@ class AppManager {
         }
     }
 
+    preLoadViews(viewNames) {
+        for (let viewName of viewNames) {
+            try {
+                fetch(`views/${viewName}/${viewName}.html`);
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = `views/${viewName}/${viewName}.css`;
+                document.head.appendChild(link);
+
+                const script = document.createElement('script');
+                script.src = `views/${viewName}/${viewName}.js`;
+                script.defer = true;
+                script.setAttribute('data-view-script', '');
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error(`Error preloading view ${viewName}:`, error);
+            }
+        }
+    }
+
     // Cargar una vista específica
     loadView(viewName, viewTitle) {
-        if (this.isLoading) return; // Si ya está cargando, no hacer nada
+        if (this.isLoading) return;
         this.isLoading = true;
-    
+
         console.log(`Loading view: ${viewName}`);
-    
+
         const contentDiv = document.getElementById('content');
-        contentDiv.style.opacity = 0; // Inicia la transición
-        
+        contentDiv.style.opacity = 0;
+
+
         // Eliminar el CSS y JS anteriores
         this.removePreviousAssets();
-    
+
         setTimeout(() => {
             fetch(`views/${viewName}/${viewName}.html`)
                 .then(response => response.text())
                 .then(html => {
                     contentDiv.innerHTML = html;
-                    
-                    // Cargar el CSS específico de la vista
+
+                    // Lazy load CSS
                     const link = document.createElement('link');
                     link.rel = 'stylesheet';
                     link.href = `views/${viewName}/${viewName}.css`;
                     link.setAttribute('data-view-style', '');
                     document.head.appendChild(link);
-                    
-                    // Cargar el JS específico de la vista
+
+                    // Lazy load JS
                     const script = document.createElement('script');
                     script.src = `views/${viewName}/${viewName}.js`;
                     script.defer = true;
@@ -60,20 +81,21 @@ class AppManager {
                         if (typeof initializeView === 'function') {
                             initializeView();
                         }
-                        this.isLoading = false; // Resetea la variable de control al finalizar la carga
+                        this.isLoading = false;
                     };
-                    contentDiv.style.opacity = 1; // Termina la transición
+                    contentDiv.style.opacity = 1;
                     document.body.appendChild(script);
-    
+
                     document.title = viewTitle;
                 })
                 .catch(error => {
                     console.error('Error al cargar la vista:', error);
-                    this.isLoading = false; // Resetea la variable de control en caso de error
+                    this.isLoading = false;
                 });
         }, 100); // Tiempo de la transición
     }
-    
+
+
 
 
     removePreviousAssets() {
@@ -105,7 +127,7 @@ class AppManager {
             }
         });
     }
-    
+
 
     // Obtener el nombre de la aplicación por su ID
     getAppNameById(id) {

@@ -33,36 +33,34 @@ class SessionManager {
     }
 
     // Maneja la respuesta de credenciales de Google
-    handleCredentialResponse(response) {
+    async handleCredentialResponse(response) {
         const idToken = response.credential;
         this.appManager.unencryptedDB.set('google_id_token', idToken);
 
-        // Decodificar el ID Token para obtener la información del usuario
         const profile = this.appManager.unencryptedDB.parseJwt(idToken);
         this.appManager.unencryptedDB.set('user_profile', profile);
 
-        // Validar y guardar el ID Token
         if (this.validateIdToken(idToken)) {
-            this.fetchAccessToken(idToken)
-                .then(accessToken => {
-                    if (accessToken) {
-                        this.appManager.unencryptedDB.set('google_access_token', accessToken);
-                        this.updateUIWithUserProfile(profile);
-                        this.appManager.loadInitialView();
-                    } else {
-                        throw new Error("Access token is null or undefined.");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching access token:', error);
-                    alert('Failed to authenticate. Please try again.');
-                    this.logout();
-                });
+            try {
+                const accessToken = await this.fetchAccessToken(idToken);
+                if (accessToken) {
+                    this.appManager.unencryptedDB.set('google_access_token', accessToken);
+                    this.updateUIWithUserProfile(profile);
+                    this.appManager.loadInitialView();
+                } else {
+                    throw new Error("Access token is null or undefined.");
+                }
+            } catch (error) {
+                console.error('Error fetching access token:', error);
+                alert('Failed to authenticate. Please try again.');
+                this.logout();
+            }
         } else {
             alert('ID Token is invalid or expired. Please sign in again.');
             this.logout();
         }
     }
+
 
     // Método para obtener el Access Token usando OAuth2
     async fetchAccessToken(idToken) {
@@ -106,16 +104,18 @@ class SessionManager {
         if (!profile) {
             profile = this.appManager.unencryptedDB.get('user_profile');
         }
+        if (profile) {
+            document.getElementById('user-name').textContent = profile.name;
+            document.getElementById('user-image').src = profile.picture;
+            document.getElementById('user-image').style.filter = 'none';
+            document.getElementById('user-image').alt = profile.email;
+            document.getElementById('user-image').style.display = "block";
+            document.getElementById('user-name').style.display = "block";
+            document.getElementById('apps').style.display = "block";
+            document.getElementById('help').style.display = "block";
+            document.getElementById('settings').style.display = "block";
+        }
 
-        document.getElementById('user-name').textContent = profile.name;
-        document.getElementById('user-image').src = profile.picture;
-        document.getElementById('user-image').style.filter = 'none';
-        document.getElementById('user-image').alt = profile.email;
-        document.getElementById('user-image').style.display = "block";
-        document.getElementById('user-name').style.display = "block";
-        document.getElementById('apps').style.display = "block";
-        document.getElementById('help').style.display = "block";
-        document.getElementById('settings').style.display = "block";
     }
 
     // Maneja la desconexión de la sesión

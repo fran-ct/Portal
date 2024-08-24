@@ -1,10 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const encryptionKey = 'my-global-secret-key';
     window.appManager = new AppManager(encryptionKey);
 
-    appManager.initializeApp();
+    await appManager.initializeApp();
 
-    // Cargar la vista inicial
+    // Precargar vistas más utilizadas
+    appManager.preLoadViews(['apps', 'worklog-manager']);
+    
     const currentHash = window.location.hash.substring(1);
     if (currentHash) {
         const viewTitle = appManager.getAppNameById(currentHash);
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appManager.loadInitialView();
     }
 
-    // Manejar clicks en botones del menú principal
+        // Manejar clicks en botones del menú principal
     document.getElementById('apps').addEventListener('click', () => {
         appManager.loadView('apps', 'Apps');
     });
@@ -26,3 +28,5 @@ document.addEventListener('DOMContentLoaded', () => {
         appManager.loadView('help', 'Help');
     });
 });
+
+
