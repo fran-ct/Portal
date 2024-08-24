@@ -10,7 +10,7 @@ class SessionManager {
             response_type: "code",
             scope: "openid profile email",
             loadUserInfo: true,
-            post_logout_redirect_uri: window.location.origin,
+            post_logout_redirect_uri: window.location.origin + "Portal",
             automaticSilentRenew: true,
             silent_redirect_uri: window.location.origin + "/Portal/auth/silent-renew.html"
         };
