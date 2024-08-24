@@ -6,13 +6,13 @@ class SessionManager {
         const oidcSettings = {
             authority: "https://accounts.google.com",
             client_id: CLIENT_ID,
-            redirect_uri: window.location.origin + "/views/callback/callback.html",  // Ruta a callback.html
+            redirect_uri: window.location.origin + "/auth/callback.html",  // Asegúrate de que esta ruta esté registrada en Google
             response_type: "code",
             scope: "openid profile email",
             loadUserInfo: true,
-            post_logout_redirect_uri: window.location.origin,  // Redirección después del logout
+            post_logout_redirect_uri: window.location.origin,
             automaticSilentRenew: true,
-            silent_redirect_uri: window.location.origin + "/views/silent-renew/silent-renew.html"  // Ruta a silent-renew.html
+            silent_redirect_uri: window.location.origin + "/auth/silent-renew.html"
         };
         
         this.userManager = new Oidc.UserManager(oidcSettings);
