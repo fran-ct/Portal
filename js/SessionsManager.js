@@ -7,16 +7,19 @@ class SessionManager {
         const oidcSettings = {
             authority: "https://accounts.google.com",
             client_id: CLIENT_ID,
-            redirect_uri: winLocationOrigin + "/auth/callback.html",  // Usa la URI que hemos logueado
-            response_type: "code",  // Usar Authorization Code Flow para obtener access_token
-            scope: "openid profile email",  // Scopes que deseas solicitar
+            redirect_uri: window.location.origin + "/Portal/auth/callback.html",
+            response_type: "code",
+            scope: "openid profile email",
             loadUserInfo: true,
-            post_logout_redirect_uri: winLocationOrigin,
+            post_logout_redirect_uri: window.location.origin + "/Portal",
             automaticSilentRenew: true,
-            silent_redirect_uri: winLocationOrigin + "/auth/silent-renew.html"
+            silent_redirect_uri: window.location.origin + "/Portal/auth/silent-renew.html",
+            userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage })  // Usa sessionStorage en lugar de localStorage
         };
-
+        
+        
         this.userManager = new Oidc.UserManager(oidcSettings);
+        
 
 
     }
