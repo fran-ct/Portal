@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await appManager.initializeApp();
 
+    
     // Precargar vistas más utilizadas
-    appManager.preLoadViews(['apps', 'worklog-manager']);
+    appManager.preLoadViews(['apps']);
+
     
     const currentHash = window.location.hash.substring(1);
     if (currentHash) {
@@ -28,5 +30,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         appManager.loadView('help', 'Help');
     });
 });
-
 
