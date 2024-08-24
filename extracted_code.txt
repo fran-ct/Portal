@@ -43,6 +43,7 @@
     <script src="js/appManager.js" defer></script> <!-- Manejo de la aplicación -->
     <script src="js/index.js" defer></script> <!-- Lista de aplicaciones -->
     <script src="js/SessionsManager.js" defer></script> <!-- Manejo de la aplicación -->
+    <script src="js/tableManager.js" defer></script> <!-- Manejo de la aplicación -->
 </body>
 </html>
 === "./css/styles.css" ===
@@ -173,6 +174,266 @@ header {
 
 
 
+=== "./js/tableManager.js" ===
+class TableManager {
+    constructor(tableId, columns, data = [], filters = {}, selectedItems = [], contextMenuOptions = [], defaultSort = null, allowMultipleSelection = true, onItemClick = null) {
+        this.tableId = tableId;
+        this.columns = columns;
+        this.data = data;
+        this.filters = filters;
+        this.selectedItems = selectedItems;
+        this.contextMenuOptions = contextMenuOptions;
+        this.defaultSort = defaultSort;
+        this.allowMultipleSelection = allowMultipleSelection;
+        this.onItemClick = onItemClick; // Función opcional a ejecutar al hacer clic en un ítem
+        this.initTable();
+        this.loadStoredFilters();
+
+        if (this.defaultSort) {
+            this.sortItems(this.defaultSort.columnId, this.defaultSort.order);
+        }
+    }
+
+    // Inicializa la tabla
+    initTable() {
+        this.renderTable();
+        this.applyFilters();
+        this.attachEventListeners();
+    }
+
+    // Renderiza la tabla
+    renderTable(filteredData = this.data) {
+        const table = document.getElementById(this.tableId);
+        table.innerHTML = '';
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        this.columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col.name;
+            th.dataset.columnId = col.id;
+            if (col.sortable) {
+                th.classList.add('sortable');
+                th.addEventListener('click', () => {
+                    this.sortItems(col.id);
+                });
+            }
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        filteredData.forEach(item => {
+            const row = document.createElement('tr');
+            row.dataset.itemId = item.id;
+            this.columns.forEach(col => {
+                const td = document.createElement('td');
+                td.textContent = item[col.id];
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+
+        this.updateSelectedUI();
+        this.updateSortUI(); // Ensure the sort UI is updated after rendering
+    }
+
+    
+
+    // Aplica los filtros a los datos
+    applyFilters() {
+        const filteredData = this.data.filter(item => {
+            return Object.keys(this.filters).every(key => {
+                const filterValue = this.filters[key];
+                if (!filterValue) return true;
+                return item[key].toLowerCase().includes(filterValue.toLowerCase());
+            });
+        });
+        this.renderTable(filteredData);
+    }
+
+    // Almacena la configuración de los filtros aplicados
+    saveFilters() {
+        localStorage.setItem(`${this.tableId}-filters`, JSON.stringify(this.filters));
+    }
+
+    // Carga la configuración de filtros almacenada
+    loadStoredFilters() {
+        const storedFilters = JSON.parse(localStorage.getItem(`${this.tableId}-filters`));
+        if (storedFilters) {
+            this.filters = storedFilters;
+            this.applyFilters();
+        }
+    }
+
+    // Actualiza la tabla con nuevos datos
+    updateData(newData) {
+        this.data = newData;
+        this.applyFilters();
+    }
+
+    // Actualiza los filtros y vuelve a renderizar la tabla
+    updateFilters(newFilters) {
+        this.filters = { ...this.filters, ...newFilters };
+        this.saveFilters();
+        this.applyFilters();
+    }
+
+    // Método para ordenar los ítems
+    sortItems(columnId, order) {
+        // Toggle the order if not specified
+        if (!order) {
+            order = this.currentSortColumn === columnId && this.currentSortOrder === 'asc' ? 'desc' : 'asc';
+        }
+
+        this.currentSortColumn = columnId;
+        this.currentSortOrder = order;
+
+        this.data.sort((a, b) => {
+            const aValue = a[columnId];
+            const bValue = b[columnId];
+
+            if (aValue < bValue) return order === 'asc' ? -1 : 1;
+            if (aValue > bValue) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        this.renderTable();
+        this.updateSortUI();
+    }
+
+    updateSortUI() {
+        const headers = document.querySelectorAll(`#${this.tableId} th`);
+        headers.forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.dataset.columnId === this.currentSortColumn) {
+                th.classList.add(`sort-${this.currentSortOrder}`);
+            }
+        });
+    }
+
+    // Maneja la selección de un ítem
+    selectItem(itemId) {
+        const item = this.data.find(item => item.id === parseInt(itemId, 10));
+
+        if (this.allowMultipleSelection) {
+            const itemIndex = this.selectedItems.indexOf(item);
+            if (itemIndex > -1) {
+                this.selectedItems.splice(itemIndex, 1); // Deseleccionar el ítem si ya estaba seleccionado
+            } else {
+                this.selectedItems.push(item); // Seleccionar el ítem
+            }
+        } else {
+            if (this.selectedItems.includes(item)) {
+                this.selectedItems = []; // Deseleccionar el ítem si ya estaba seleccionado
+            } else {
+                this.selectedItems = [item]; // Seleccionar el ítem
+            }
+        }
+
+        this.updateSelectedUI();
+    }
+
+    // Actualiza la UI de ítems seleccionados
+    updateSelectedUI() {
+        const rows = document.querySelectorAll(`#${this.tableId} tbody tr`);
+        rows.forEach(row => {
+            const itemId = parseInt(row.dataset.itemId, 10);
+            if (this.selectedItems.some(item => item.id === itemId)) {
+                row.classList.add('selected');
+            } else {
+                row.classList.remove('selected');
+            }
+        });
+    }
+
+    // Obtiene los ítems seleccionados
+    getSelectedItems() {
+        return this.selectedItems;
+    }
+
+    // Muestra el menú contextual
+    showContextMenu(event, itemId) {
+        event.preventDefault();
+
+        // Eliminar cualquier menú contextual existente
+        const existingMenu = document.querySelector('.context-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+
+        const contextMenu = document.createElement('div');
+        contextMenu.classList.add('context-menu');
+
+        this.contextMenuOptions.forEach(option => {
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('context-menu-item');
+            menuItem.textContent = option.label;
+            menuItem.addEventListener('click', () => {
+                option.action(itemId);
+                contextMenu.remove(); // Eliminar el menú después de hacer clic en una opción
+            });
+            contextMenu.appendChild(menuItem);
+        });
+
+        document.body.appendChild(contextMenu);
+
+        const { clientX: mouseX, clientY: mouseY } = event;
+        const { clientWidth: menuWidth, clientHeight: menuHeight } = contextMenu;
+
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Asegurar que el menú no salga de la ventana
+        contextMenu.style.top = `${mouseY + menuHeight > windowHeight ? windowHeight - menuHeight : mouseY}px`;
+        contextMenu.style.left = `${mouseX + menuWidth > windowWidth ? windowWidth - menuWidth : mouseX}px`;
+
+        // Ocultar el menú al hacer clic en otro lugar
+        document.addEventListener('click', () => {
+            contextMenu.remove();
+        }, { once: true });
+    }
+    // Añade o quita columnas de la tabla
+    updateColumns(newColumns) {
+        this.columns = newColumns;
+        this.renderTable();
+    }
+
+    // Adjunta los event listeners necesarios
+    attachEventListeners() {
+        const table = document.getElementById(this.tableId);
+
+        // Evento para manejar la selección de ítems
+        table.addEventListener('click', event => {
+            if (event.target.tagName === 'TD') {
+                const row = event.target.parentElement;
+                this.selectItem(row.dataset.itemId);
+                if (this.onItemClick) {
+                    this.onItemClick(row.dataset.itemId); // Ejecuta la función parametrizada
+                }
+            }
+        });
+
+        // Evento para manejar el menú contextual
+        table.addEventListener('contextmenu', event => {
+            if (this.contextMenuOptions.length > 0) {
+                if (event.target.tagName === 'TD') {
+                    const row = event.target.parentElement;
+                    this.showContextMenu(event, row.dataset.itemId);
+                }
+            } else {
+                event.preventDefault(); // Prevenir el menú contextual por defecto si no hay opciones definidas
+            }
+        });
+    }
+
+    clearSelection() {
+        this.selectedItems = [];
+        this.updateSelectedUI();
+    }
+}
 === "./js/storageDB.js" ===
 var CLIENT_ID = "654333069607-t118hpn2v2ui383h9fcfpo0aspiv4tva.apps.googleusercontent.com";
 
@@ -294,7 +555,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 === "./js/appManager.js" ===
-console.log("Ver: 1.9")
+console.log("Ver: 2.0")
 
 class AppManager {
     constructor(encryptionKey) {
@@ -784,15 +1045,9 @@ function initializeView() {
 
 
 === "./views/worklog-manager/worklog-manager.html" ===
-
-
 <div class="app worklog-manager" id="worklog-manager">
     <div class="container z-depth-3" id="container1">
         <div id="filter-issues" class="subContainer z-depth-2">
-            <div class="filterRow">
-                <label for="squadId">Squad:</label>
-                <select id="squadId" class="browser-default"></select>
-            </div>
             <div class="filterRow">
                 <label for="project">Project:</label>
                 <select id="project" class="browser-default"></select>
@@ -805,6 +1060,9 @@ function initializeView() {
                 <label for="searchIssue">Search:</label>
                 <input type="text" id="searchIssue" placeholder="Start writing to filter" />
             </div>
+            <div class="buttonRow">
+                <button id="updateIssues-btn">Update Issues</button>
+            </div>
         </div>
         <div class="issues z-depth-2">
             <table id="issuesTable">
@@ -816,27 +1074,7 @@ function initializeView() {
                         <th class="center-text">Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Implement login feature</td>
-                        <td class="center-text">3h </td>
-                        <td><a href="https://example.com/issue/1234" target="_blank">#1234</a></td>
-                        <td class="center-text">In Progress</td>
-                    </tr>
-                    <tr>
-                        <td>Fix bug in payment processing</td>
-                        <td class="center-text">2h</td>
-                        <td><a href="https://example.com/issue/5678" target="_blank">#5678</a></td>
-                        <td class="center-text">Done</td>
-                    </tr>
-                    <tr>
-                        <td>Update user dashboard</td>
-                        <td class="center-text">30m</td>
-                        <td><a href="https://example.com/issue/9101" target="_blank">#9101</a></td>
-                        <td class="center-text">To Do</td>
-                    </tr>
-                </tbody>
-
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -854,7 +1092,7 @@ function initializeView() {
                 </div>
 
                 <div class="buttonRow">
-                    <button id="updateEvents-btn">Update</button>
+                    <button id="updateEvents-btn">Update Events</button>
                 </div>
             </div>
             <div class="events z-depth-2">
@@ -866,390 +1104,133 @@ function initializeView() {
                             <th>Duration</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>09:00 AM</td>
-                            <td>Daily Standup</td>
-                            <td>30m</td>
-                        </tr>
-                        <tr>
-                            <td>11:00 AM</td>
-                            <td>Client Meeting</td>
-                            <td>1h</td>
-                        </tr>
-                        <tr>
-                            <td>02:00 PM</td>
-                            <td>Code Review</td>
-                            <td>1h 15m</td>
-                        </tr>
-                    </tbody>
-
+                    <tbody></tbody>
                 </table>
             </div>
-
         </div>
         <div class="container z-depth-3" id="container3">
             <div>
                 <input type="text" class="toComment" id="selectedEventComment" placeholder="Comment" />
             </div>
             <div class="buttonRow button-container">
-                <button id="syncButton">Sync</button>
+                <button id="syncButton" disabled>Sync</button>
             </div>
         </div>
     </div>
-</div>=== "./views/worklog-manager/worklog-manager.js" ===
-// Check if the variables are already defined
-if (typeof issues === 'undefined') {
-    var issues = [];
-}
-if (typeof selectedIssue === 'undefined') {
-    var selectedIssue = null;
-}
-if (typeof selectedEvent === 'undefined') {
-    var selectedEvent = null;
-}
-
+</div>
+=== "./views/worklog-manager/worklog-manager.js" ===
 function initializeView() {
+    const issuesTable = new TableManager(
+        'issuesTable',
+        [
+            { id: 'summary', name: 'Summary', sortable: true },
+            { id: 'timeSpent', name: 'Time Spent', sortable: true },
+            { id: 'link', name: 'Link', sortable: false },
+            { id: 'status', name: 'Status', sortable: true }
+        ],
+        [], // Data se actualizará dinámicamente
+        {}, // Filtros iniciales
+        [], // Ítems seleccionados
+        [    { label: 'View Details', action: (itemId) => viewDetails(itemId) },
+        { label: 'Edit', action: (itemId) => editItem(itemId) },
+        { label: 'Delete', action: (itemId) => deleteItem(itemId) }], // Opciones del menú contextual
+        { columnId: 'summary', order: 'asc' }, // Orden por defecto
+        true, // Selección múltiple no permitida
+        handleItemClick // Función a ejecutar al hacer clic en un ítem
+    );
 
-    // Verificar si el usuario está autenticado
-    if (!appManager.sessionManager.isSessionActive()) {
-        alert('You must be logged in to use the Worklog Manager.');
-        appManager.loadView('signin', 'Sign In');
-        return;
-    }
+    const eventsTable = new TableManager(
+        'eventsTable',
+        [
+            { id: 'startTime', name: 'Start Time', sortable: true },
+            { id: 'title', name: 'Title', sortable: true },
+            { id: 'duration', name: 'Duration', sortable: false }
+        ],
+        [], // Data se actualizará dinámicamente
+        {}, // Filtros iniciales
+        [], // Ítems seleccionados
+        [], // Opciones del menú contextual
+        { columnId: 'startTime', order: 'asc' }, // Orden por defecto
+        false, // Selección múltiple no permitida
+        handleItemClick // Función a ejecutar al hacer clic en un ítem
+    );
 
-    // Cargar los calendarios disponibles y los eventos del día
-    loadAvailableCalendars();
-    filterEvents();
+    // Eventos para actualizar issues y eventos
+    document.getElementById('updateIssues-btn').addEventListener('click', () => updateIssues(issuesTable));
+    document.getElementById('updateEvents-btn').addEventListener('click', () => updateEvents(eventsTable));
 
-    // Configurar los eventos para los selectores de calendario y fecha
-    document.getElementById('calendar-select').addEventListener('change', filterEvents);
-    document.getElementById('date-input').addEventListener('change', filterEvents);
-    document.getElementById('updateEvents-btn').addEventListener('click', filterEvents);
-
-    // Cargar los issues de Jira desde Google Sheets
-    loadIssuesFromSpreadsheet();
-
-    // Configurar los filtros de issues
-    document.getElementById('squadId').addEventListener('change', filterIssues);
-    document.getElementById('project').addEventListener('change', filterIssues);
-    document.getElementById('assignee').addEventListener('change', filterIssues);
-    document.getElementById('searchIssue').addEventListener('input', filterIssues);
-
-    // Configurar el botón de sincronización
+    // Evento para manejar la sincronización
     document.getElementById('syncButton').addEventListener('click', syncWorklog);
-}
 
-// Cargar calendarios desde Google Calendar
-function loadAvailableCalendars() {
-    const accessToken = appManager.unencryptedDB.get('access_token');
-    fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.items) {
-            populateCalendars(data.items);
-            document.getElementById('calendar-select').value = data.items[0].id; // Seleccionar el primer calendario por defecto
+    // Cargar Issues y Eventos al inicio
+    updateIssues(issuesTable);
+    updateEvents(eventsTable);
+
+    // Función para manejar el clic en un ítem de la tabla
+    function handleItemClick(itemId) {
+        checkSyncAvailability();
+    }
+
+    // Verifica si los botones de sync deben estar habilitados
+    function checkSyncAvailability() {
+        const syncButton = document.getElementById('syncButton');
+        if (issuesTable.getSelectedItems().length > 0 && eventsTable.getSelectedItems().length > 0) {
+            syncButton.disabled = false;
         } else {
-            showError('Error loading calendars.');
+            syncButton.disabled = true;
         }
-    })
-    .catch(error => {
-        showError('Error communicating with Google Calendar API.');
-    });
-}
-
-// Llenar el select de calendarios
-function populateCalendars(calendars) {
-    const calendarSelect = document.getElementById('calendar-select');
-    calendarSelect.innerHTML = '';
-    calendars.forEach(calendar => {
-        const option = document.createElement('option');
-        option.value = calendar.id;
-        option.textContent = calendar.summary;
-        calendarSelect.appendChild(option);
-    });
-}
-
-// Filtrar y mostrar eventos desde Google Calendar
-function filterEvents() {
-    const dateInput = document.getElementById('date-input').value;
-    const calendarId = document.getElementById('calendar-select').value;
-    const accessToken = appManager.unencryptedDB.get('access_token');
-
-    // Ensure we have a valid date
-    const date = new Date(dateInput);
-    if (isNaN(date.getTime())) {
-        showError('Invalid date selected');
-        return;
     }
 
-    const timeMin = date.toISOString();
-    const timeMax = new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString();
-
-    fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${timeMin}&timeMax=${timeMax}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.items) {
-            updateEventsList(data.items);
-        } else {
-            showError('Error loading events.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with Google Calendar API.');
-    });
-}
-
-// Actualizar la lista de eventos en la UI
-function updateEventsList(events) {
-    const list = document.querySelector("#eventsTable tbody");
-    list.innerHTML = '';
-    events.forEach(event => {
-        const row = document.createElement('tr');
-        row.classList.add('event-row');
-        row.id = event.id;
-
-        const startTimeCol = document.createElement('td');
-        startTimeCol.textContent = moment(event.start.dateTime).format("HH:mm");
-
-        const titleCol = document.createElement('td');
-        titleCol.textContent = event.summary;
-
-        const durationCol = document.createElement('td');
-        const start = moment(event.start.dateTime);
-        const end = moment(event.end.dateTime);
-        durationCol.textContent = moment.duration(end.diff(start)).humanize();
-
-        row.appendChild(startTimeCol);
-        row.appendChild(titleCol);
-        row.appendChild(durationCol);
-        list.appendChild(row);
-    });
-
-    // Configurar el evento de selección de fila
-    document.querySelectorAll('.event-row').forEach(row => {
-        row.addEventListener('click', function () {
-            selectEvent(row.id);
-        });
-    });
-}
-
-// Seleccionar un evento
-function selectEvent(eventId) {
-    const event = events.find(e => e.id === eventId);
-    if (event) {
-        selectedEvent = event;
-        document.getElementById('selectedEventComment').value = event.summary;
-        document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
-        document.getElementById(eventId).classList.add('selected');
-    }
-}
-
-// Cargar issues desde Google Sheets
-function loadIssuesFromSpreadsheet() {
-    const spreadsheetId = 'YOUR_SPREADSHEET_ID';
-    const range = 'Sheet1!A:G'; // Ajusta el rango según tu hoja de cálculo
-    const accessToken = appManager.unencryptedDB.get('access_token');
-
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.values) {
-            issues = data.values.map(row => ({
-                id: row[0],
-                summary: row[1],
-                squadId: row[2],
-                project: row[3],
-                assigneeName: row[4],
-                status: row[5],
-                timespent: row[6]
-            }));
-            populateIssueFilters(issues);
-            updateIssuesTable(issues);
-        } else {
-            showError('Error loading issues from spreadsheet.');
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with Google Sheets API.');
-    });
-}
-
-// Llenar los selectores de filtros de issues
-function populateIssueFilters(issues) {
-    const squads = removeDups(issues.map(issue => issue.squadId));
-    populateSelectOptions('squadId', squads);
-
-    const projects = removeDups(issues.map(issue => issue.project));
-    populateSelectOptions('project', projects);
-
-    const assignees = removeDups(issues.map(issue => issue.assigneeName));
-    populateSelectOptions('assignee', assignees);
-}
-
-// Llenar un select con opciones
-function populateSelectOptions(elementId, options) {
-    const select = document.getElementById(elementId);
-    select.innerHTML = '<option value="Select">Select</option>';
-    options.forEach(option => {
-        const opt = document.createElement('option');
-        opt.value = option;
-        opt.textContent = option;
-        select.appendChild(opt);
-    });
-}
-
-// Filtrar issues en la tabla
-function filterIssues() {
-    const squadId = document.getElementById('squadId').value;
-    const project = document.getElementById('project').value;
-    const assignee = document.getElementById('assignee').value;
-    const searchText = document.getElementById('searchIssue').value.toLowerCase();
-
-    let filteredIssues = issues;
-
-    if (squadId !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.squadId === squadId);
-    }
-    if (project !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.project === project);
-    }
-    if (assignee !== "Select") {
-        filteredIssues = filteredIssues.filter(issue => issue.assigneeName === assignee);
-    }
-    if (searchText) {
-        filteredIssues = filteredIssues.filter(issue => issue.summary.toLowerCase().includes(searchText));
+    // Actualiza la lista de issues desde Jira
+    function updateIssues(tableManager) {
+        const jiraToken = appManager.encryptedDB.get('jira_token');
+        // Aquí haces la llamada a la API de Jira para obtener los issues y actualizar la tabla
+        // Ejemplo ficticio:
+        const issues = [
+            { id: 1, summary: 'Issue 1', timeSpent: '2h', link: 'https://jira.example.com/1', status: 'Open' },
+            { id: 2, summary: 'Issue 2', timeSpent: '1h', link: 'https://jira.example.com/2', status: 'In Progress' }
+        ];
+        tableManager.updateData(issues);
     }
 
-    updateIssuesTable(filteredIssues);
-}
+    // Actualiza la lista de eventos desde Google Calendar
+    function updateEvents(tableManager) {
+        const calendarId = document.getElementById('calendar-select').value;
+        const date = document.getElementById('date-input').value;
+        const accessToken = appManager.unencryptedDB.get('access_token');
 
-// Actualizar la tabla de issues en la UI
-function updateIssuesTable(filteredIssues) {
-    const tableBody = document.querySelector("#issuesTable tbody");
-    tableBody.innerHTML = '';
-    filteredIssues.forEach(issue => {
-        const row = document.createElement('tr');
-        row.classList.add('issue-row');
-        row.id = issue.id;
-
-        const summaryCol = document.createElement('td');
-        summaryCol.textContent = issue.summary;
-
-        const spentCol = document.createElement('td');
-        spentCol.classList.add('center-text');
-        spentCol.textContent = issue.timespent ? moment.duration(issue.timespent, 'seconds').humanize() : 'none';
-
-        const linkCol = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = `https://your-jira-domain.atlassian.net/browse/${issue.key}`;
-        link.target = '_blank';
-        link.textContent = issue.key;
-        linkCol.appendChild(link);
-
-        const statusCol = document.createElement('td');
-        statusCol.classList.add('center-text');
-        statusCol.textContent = issue.status;
-
-        row.appendChild(summaryCol);
-        row.appendChild(spentCol);
-        row.appendChild(linkCol);
-        row.appendChild(statusCol);
-        tableBody.appendChild(row);
-    });
-
-    // Configurar el evento de selección de fila
-    document.querySelectorAll('.issue-row').forEach(row => {
-        row.addEventListener('click', function () {
-            selectIssue(row.id);
-        });
-    });
-}
-
-// Seleccionar un issue
-function selectIssue(issueId) {
-    const issue = issues.find(i => i.id === issueId);
-    if (issue) {
-        selectedIssue = issue;
-        document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-        document.getElementById(issueId).classList.add('selected');
-        document.getElementById('selectedIssueKey').value = issue.key;
-    }
-}
-
-// Sincronizar worklog a Jira
-function syncWorklog() {
-    if (!selectedIssue || !selectedEvent) {
-        showError('Please select both an issue and an event to sync.');
-        return;
+        // Aquí haces la llamada a la API de Google Calendar para obtener los eventos y actualizar la tabla
+        // Ejemplo ficticio:
+        const events = [
+            { id: 1, startTime: '09:00 AM', title: 'Event 1', duration: '1h' },
+            { id: 2, startTime: '11:00 AM', title: 'Event 2', duration: '2h' }
+        ];
+        tableManager.updateData(events);
     }
 
-    const comment = document.getElementById('selectedEventComment').value;
-    const duration = moment.duration(moment(selectedEvent.end.dateTime).diff(moment(selectedEvent.start.dateTime))).asSeconds();
-    const jiraToken = appManager.encryptedDB.get('jira_token');
+    // Sincroniza el worklog de Jira con los eventos de Calendar
+    function syncWorklog() {
+        const selectedIssue = issuesTable.getSelectedItems()[0];
+        const selectedEvent = eventsTable.getSelectedItems()[0];
+        const comment = document.getElementById('selectedEventComment').value;
 
-    fetch(`https://your-jira-domain.atlassian.net/rest/api/2/issue/${selectedIssue.key}/worklog`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${btoa('your-email:' + jiraToken)}`, // Asumiendo que usas Basic Auth
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            timeSpentSeconds: duration,
-            comment: comment,
-            started: moment(selectedEvent.start.dateTime).toISOString()
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.id) {
-            document.querySelectorAll('.issue-row').forEach(row => row.classList.remove('selected'));
-            document.querySelectorAll('.event-row').forEach(row => row.classList.remove('selected'));
+        // Aquí haces la llamada para sincronizar el worklog en Jira usando los datos seleccionados
+        console.log('Sincronizando:', selectedIssue, selectedEvent, comment);
+
+        // Deshabilitar el botón de sync durante la sincronización
+        document.getElementById('syncButton').disabled = true;
+
+        // Simulación de la sincronización y reactivación del botón
+        setTimeout(() => {
+            document.getElementById('syncButton').disabled = false;
+            alert('Worklog sincronizado con éxito');
+
+            // Deseleccionar los ítems después de sincronizar
+            issuesTable.clearSelection();
+            eventsTable.clearSelection();
             document.getElementById('selectedEventComment').value = '';
-            showSuccess('Worklog uploaded successfully.');
-        } else {
-            showError('Error uploading worklog: ' + data.message);
-        }
-    })
-    .catch(error => {
-        showError('Error communicating with Jira API.');
-    });
-}
-
-// Mostrar errores
-function showError(message) {
-    console.error(message);
-    // Puedes implementar un sistema de notificación visual aquí si lo deseas.
-}
-
-// Mostrar éxito
-function showSuccess(message) {
-    console.log(message);
-    // Implementar notificación visual de éxito si es necesario
-}
-
-// Eliminar duplicados de una lista
-function removeDups(list) {
-    let unique = {};
-    list.forEach(function (i) {
-        unique[i] = true;
-    });
-    return Object.keys(unique);
+        }, 2000);
+    }
 }
 === "./views/worklog-manager/worklog-manager.css" ===
 /* Worklog Manager Specific Styles */
@@ -1258,8 +1239,17 @@ function removeDups(list) {
     gap: 20px;
     flex-wrap: wrap;
     flex-direction: row;
-
 }
+
+tr.selected {
+    background-color: #722424; /* Cambia este color según tu preferencia */
+    color: #fff; /* Texto blanco para mayor contraste */
+}
+tr.selected:hover {
+    background-color: #420b0b; /* Mismo color que la selección */
+    color: #fff; /* Color de texto que contraste */
+}
+
 
 td {
     font-size: 0.9rem;
@@ -1270,23 +1260,18 @@ label {
     flex: 0.3;
 }
 
-
-
 select, input {
     padding: 0.3rem;
     background-color: #444;
     border: none;
     color: #e0e0e0;
     flex: 1;
-
 }
 
 .buttonRow {
     display: flex;
     justify-content: flex-end;
-
 }
-
 
 #content {
     margin-top: 20px;
@@ -1308,11 +1293,6 @@ select, input {
     box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.3);
 }
 
-#container1{
-    flex: 1;
-}
-
-
 .subContainer {
     padding: 10px;
     margin-bottom: 15px;
@@ -1320,13 +1300,11 @@ select, input {
     box-shadow: 2px 3px 20px 4px rgba(0, 0, 0, 0.3)
 }
 
-
-.container-group{
+.container-group {
     display: flex;
     flex-direction: column;
     gap: 20px;
     flex: 1;
-
 }
 
 .issues,
@@ -1353,11 +1331,6 @@ select, input {
     padding: 0.3rem;
     border-bottom: 1px solid #333;
 }
-
-#updateEvents-btn {
-    margin-top: 12px;
-}
-
 
 th {
     background-color: #333;
@@ -1417,10 +1390,6 @@ button:disabled {
     width: calc(100% - 14px);
 }
 
-
-
-
-
 @media (max-width: 768px) {
     td {
         font-size: 0.9rem;
@@ -1432,15 +1401,12 @@ button:disabled {
         row-gap: 15px;
         flex-wrap: wrap;
         flex-direction: column;
-    
     }
-    .container-group{
+    .container-group {
         column-gap: 10px;
         row-gap: 15px;
     }
-    
 }
-
 
 @media (max-width: 450px) {
     td {
@@ -1449,7 +1415,57 @@ button:disabled {
     th {
         font-size: 0.9rem;
     }
+}
 
+
+
+/* menu contextual
+/* Estilo básico del menú contextual */
+.context-menu {
+    position: absolute;
+    background-color: #2c2c2c;
+    border: 1px solid #555;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    padding: 5px 0;
+    width: 200px;
+}
+
+/* Estilo para los elementos del menú */
+.context-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    color: #ddd;
+    font-size: 14px;
+}
+
+/* Efecto hover para los elementos del menú */
+.context-menu-item:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Estilo para separar los elementos */
+.context-menu-item + .context-menu-item {
+    border-top: 1px solid #444;
+}
+
+
+
+
+/* Estilo para Ordenamiento tabla */
+th.sortable {
+    cursor: pointer;
+}
+
+th.sort-asc::after {
+
+    /* content: ' ▲'; /* You can customize this arrow */
+}
+
+th.sort-desc::after {
+    /* content: ' ▼'; /* You can customize this arrow */
 }=== "./views/signin/signin.js" ===
 function initializeView() {
     const googleIdToken = appManager.unencryptedDB.get('google_id_token');

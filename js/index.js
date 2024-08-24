@@ -4,11 +4,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await appManager.initializeApp();
 
-    
     // Precargar vistas más utilizadas
-    appManager.preLoadViews(['apps']);
+    appManager.preLoadViews(['apps', 'signin', 'settings']);
 
-    
     const currentHash = window.location.hash.substring(1);
     if (currentHash) {
         const viewTitle = appManager.getAppNameById(currentHash);
@@ -17,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         appManager.loadInitialView();
     }
 
-        // Manejar clicks en botones del menú principal
+    // Manejar clicks en botones del menú principal
     document.getElementById('apps').addEventListener('click', () => {
         appManager.loadView('apps', 'Apps');
     });
@@ -30,4 +28,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         appManager.loadView('help', 'Help');
     });
 });
-
