@@ -2,8 +2,6 @@ class SessionManager {
     constructor(appManager) {
         this.appManager = appManager;
 
-        const winLocationOrigin = window.location.origin + "/Portal";
-
         const oidcSettings = {
             authority: "https://accounts.google.com",
             client_id: CLIENT_ID,
@@ -14,17 +12,12 @@ class SessionManager {
             post_logout_redirect_uri: window.location.origin + "/Portal",
             automaticSilentRenew: true,
             silent_redirect_uri: window.location.origin + "/Portal/auth/silent-renew.html",
-            userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage })  // Usa sessionStorage en lugar de localStorage
+            userStore: new Oidc.WebStorageStateStore({ store: window.sessionStorage }) 
         };
         
-        
         this.userManager = new Oidc.UserManager(oidcSettings);
-        
-
-
     }
 
-    // Método para inicializar la autenticación
     async initialize() {
         try {
             const user = await this.userManager.getUser();
@@ -40,42 +33,20 @@ class SessionManager {
         }
     }
 
-    // Iniciar sesión
+    // Manejar almacenamiento del token de One Tap
+    storeIdToken(idToken) {
+        this.appManager.unencryptedDB.set('google_id_token', idToken);
+        this.updateUIWithUserProfile();
+    }
+
+    // Iniciar sesión con OIDC
     login() {
         this.userManager.signinRedirect();
-    }
-
-    // Manejar el callback después de la autenticación
-    async handleCallback() {
-        try {
-            const user = await this.userManager.signinRedirectCallback();
-            this.storeUser(user);
-            window.location.href = "/";
-        } catch (error) {
-            console.error("Error handling callback", error);
-        }
-    }
-
-    // Logout
-    logout() {
-        this.userManager.signoutRedirect();
     }
 
     // Almacena los datos del usuario
     storeUser(user) {
         this.appManager.encryptedDB.set('google_user', user);
-    }
-
-    // Recupera el ID token almacenado
-    getIdToken() {
-        const user = this.appManager.encryptedDB.get('google_user');
-        return user ? user.id_token : null;
-    }
-
-    // Recupera el access token almacenado
-    getAccessToken() {
-        const user = this.appManager.encryptedDB.get('google_user');
-        return user ? user.access_token : null;
     }
 
     // Actualiza la UI con la información del perfil del usuario
@@ -96,12 +67,10 @@ class SessionManager {
         return !!user && !user.expired;
     }
 
-    // Maneja la renovación silenciosa del token
-    handleSilentRenew() {
-        this.userManager.signinSilentCallback().then(() => {
-            console.log("Silent renew successful");
-        }).catch(error => {
-            console.error("Error during silent renew", error);
-        });
+    // Logout
+    logout() {
+        this.userManager.signoutRedirect();
     }
 }
+
+window.sessionManager = new SessionManager(appManager);

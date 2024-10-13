@@ -1,44 +1,26 @@
+// signin.js
 function initializeView() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const authorizationCode = urlParams.get('code');
+    google.accounts.id.initialize({
+        client_id: "YOUR_GOOGLE_CLIENT_ID",
+        callback: handleCredentialResponse
+    });
 
-    if (authorizationCode) {
-        sessionManager.fetchAccessToken(authorizationCode).then(accessToken => {
-            if (accessToken) {
-                sessionManager.storeAccessToken(accessToken);
-                appManager.loadView('apps', 'Apps');
-            } else {
-                alert('Failed to obtain access token. Please try signing in again.');
-                appManager.loadView('signin', 'Sign In');
-            }
-        });
-    } else {
-        const googleIdToken = sessionManager.getIdToken();
-        const googleAccessToken = sessionManager.getAccessToken();
+    // Mostrar el One Tap Sign-In automáticamente
+    google.accounts.id.prompt();
 
-        if (googleIdToken && appManager.unencryptedDB.isGtokenValid(googleIdToken) &&
-            googleAccessToken && sessionManager.validateAccessToken(googleAccessToken)) {
-
-            const profile = appManager.unencryptedDB.get('user_profile');
-
-            // Mostrar mensaje de que ya está autenticado
-            document.getElementById('signInMessage').textContent = `You are already signed in as ${profile.name}.`;
-
-            // Calcular y mostrar la fecha de expiración del token en la consola
-            const decodedToken = appManager.unencryptedDB.parseJwt(googleIdToken);
-            const expirationDate = new Date(decodedToken.exp * 1000);
-            console.log(`Token expires at: ${expirationDate}`);
-
-            // Ocultar el botón de iniciar sesión
-            document.getElementById('signInButton').style.display = 'none';
+    // Lógica para manejar el ID token recibido de Google One Tap
+    function handleCredentialResponse(response) {
+        if (response.credential) {
+            sessionManager.storeIdToken(response.credential);
+            appManager.loadView('apps', 'Apps');
         } else {
-            // Renderizar el botón de Google Sign-In si no está autenticado
-            google.accounts.id.renderButton(
-                document.getElementById("signInButton"),
-                { theme: "outline", size: "large", text: "signin", shape: "pill" }
-            );
-
-            google.accounts.id.prompt(); // Opcional: solicitar inicio de sesión automático
+            // Si el usuario cancela One Tap, mostramos un botón para el inicio de sesión tradicional
+            document.getElementById('signInButton').style.display = 'block';
         }
     }
+
+    // Botón de inicio de sesión tradicional si el One Tap no fue exitoso
+    document.getElementById('signInButton').addEventListener('click', () => {
+        sessionManager.login();
+    });
 }
